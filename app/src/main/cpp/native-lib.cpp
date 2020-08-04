@@ -10,6 +10,17 @@
 EglHelper *wlEglHelper = NULL;
 ANativeWindow *nativeWindow = NULL;
 EglThread *thread=NULL;
+
+void onCreate(void*){
+
+}
+void onChange(int width,int height,void *){
+    glViewport(0, 0, width, height);
+}
+void onDraw(void *){
+    glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_kwai_video_uikit_anative_MainActivity_stringFromJNI(
         JNIEnv* env,
@@ -24,28 +35,12 @@ Java_com_kwai_video_uikit_opengl_NativeOpengl_surfaceCreate(JNIEnv *env, jobject
     nativeWindow = ANativeWindow_fromSurface(env, surface);
     thread= new EglThread();
     thread->onSurfaceCreate(nativeWindow);
-/*
-    wlEglHelper = new EglHelper();
-    wlEglHelper->initEgl(nativeWindow);
-
-    //opnegl
-    glViewport(0, 0, 720, 1280);
-
-    glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    wlEglHelper->swapBuffers();*/
+    thread->callBackOnCreate(onCreate,thread);
+    thread->callBackOnChange(onChange,thread);
+    thread->callBackOnDraw(onDraw,thread);
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_kwai_video_uikit_opengl_NativeOpengl_surfaceChange(JNIEnv *env, jobject thiz, jint i1,
                                                             jint i2) {
    thread->onSurfaceChange(i1,i2);
-}extern "C"
-JNIEXPORT jint JNICALL
-Java_com_kwai_video_uikit_anative_MainActivity_sum(JNIEnv *env, jobject thiz) {
-    int   a= 0 ;
-    int b =2;
-    int sum = a +b ;
-
-    return sum;
 }

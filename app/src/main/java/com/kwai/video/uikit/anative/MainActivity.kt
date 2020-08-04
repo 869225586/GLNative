@@ -45,14 +45,7 @@ class MainActivity : AppCompatActivity() {
         delay(4000)
         return 2
     }
-    fun  aw() {
 
-    }
-    external fun sum():Int;
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
     external fun stringFromJNI(): String
 
     companion object {
