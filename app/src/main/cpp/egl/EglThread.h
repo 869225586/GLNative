@@ -12,7 +12,8 @@
 #include "EglHelper.h"
 #include <unistd.h>
 #include "GLES2/gl2.h"
-
+#define RENDER_AUTO 1
+#define RENDER_HADNLE 2
 class EglThread {
 public: pthread_t pthread=-1;
         ANativeWindow *nativeWindow = NULL;
@@ -36,6 +37,11 @@ public: pthread_t pthread=-1;
         onDraw draw;
         void *onDrawCtx;
 
+        int renderType= RENDER_AUTO;//默认是自动刷新
+
+        pthread_mutex_t pthreadMutex; //线程锁
+
+        pthread_cond_t  pthreadCond;  //线程锁条件 用于接收释放信号
 
 public:
     EglThread();
@@ -51,6 +57,9 @@ public:
 
     void callBackOnDraw(onDraw draw,void *ctx);
 
+    void setRenderType(int renderType);//设置渲染模式
+
+    void notifyRender();//用于手动渲染模式 的 更新功能
     };
 
 

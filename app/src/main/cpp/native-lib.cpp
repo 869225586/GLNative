@@ -32,9 +32,21 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_kwai_video_uikit_opengl_NativeOpengl_surfaceCreate(JNIEnv *env, jobject thiz,
                                                             jobject surface) {
+    //通过传过来的 surface 对象创建一个 nativewindow
     nativeWindow = ANativeWindow_fromSurface(env, surface);
+    //创建egl 线程 对象
     thread= new EglThread();
+
+    /**调用线程的create
+     * 开始创建线程 内部
+     * 1 创建 egl 环境
+     * 2 将这里获取的surface转化成 native window 传给 egl 进行 后期的渲染 交换数据
+     * 3 在线程里面进行 oncreate onchange  ondestroy 这三个方法的回调
+     */
     thread->onSurfaceCreate(nativeWindow);
+    //设置刷新模式
+    thread->setRenderType(RENDER_HADNLE);
+    //设置几个方法的回调函数 在回调函数里做 opengl 的绘制
     thread->callBackOnCreate(onCreate,thread);
     thread->callBackOnChange(onChange,thread);
     thread->callBackOnDraw(onDraw,thread);
@@ -43,4 +55,7 @@ JNIEXPORT void JNICALL
 Java_com_kwai_video_uikit_opengl_NativeOpengl_surfaceChange(JNIEnv *env, jobject thiz, jint i1,
                                                             jint i2) {
    thread->onSurfaceChange(i1,i2);
+//   usleep(1000000);//睡眠一会
+//   //测试手动刷新
+//   thread->notifyRender();
 }

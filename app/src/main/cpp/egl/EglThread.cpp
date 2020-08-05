@@ -5,11 +5,15 @@
 #include "EglThread.h"
 
 EglThread::EglThread() {
-
+  ////  使用锁 对象创建 首先初始化这个锁 和 信号
+  pthread_mutex_init(&pthreadMutex,NULL);
+  pthread_cond_init(&pthreadCond,NULL);
 }
 
 EglThread::~EglThread() {
-
+   //// 析构函数  销毁锁和信号
+   pthread_mutex_destroy(&pthreadMutex);
+   pthread_cond_destroy(&pthreadCond);
 }
 
 void *eglThreadImpl(void *context) {
@@ -31,12 +35,25 @@ void *eglThreadImpl(void *context) {
                  //调用change 回调函数  参数为获取到的width 和 height
                  eglThread->change(eglThread->surfaceWidth,eglThread->surfaceHeight,eglThread->onChangeCtx);
              }
-//            LOGD("draw");
+
              if(eglThread->isStart){
+                 LOGD("draw");
                  eglThread->draw(eglThread->onDrawCtx);
                  eglHelper->swapBuffers();
              }
-             usleep(1000000/60);//睡眠一会 一秒 执行60次  60 帧
+             //// 区分自动刷新和手动刷新
+             if(eglThread->renderType==RENDER_AUTO){
+                 usleep(1000000/60);//睡眠一会 一秒 执行60次  60 帧
+             }else{
+                 //// 手动刷新只执行一次 swap  之后就阻塞 只有手动 解锁才能继续执行
+                 //1 上锁
+                 // 2 信号等待 （线程会阻塞在这里 直到收到信号 往下执行 第 3 步 ）
+                 // 3  释放锁
+                 pthread_mutex_lock(&eglThread->pthreadMutex);
+                 pthread_cond_wait(&eglThread->pthreadCond,&eglThread->pthreadMutex);
+                 pthread_mutex_unlock(&eglThread->pthreadMutex);
+             }
+
              if(eglThread->isExit){
                  break;
              }
@@ -72,4 +89,27 @@ void EglThread::callBackOnChange(EglThread::onChange change, void *ctx) {
 void EglThread::callBackOnDraw(EglThread::onDraw draw, void *ctx) {
      this->draw=draw;
      this->onDrawCtx=ctx;
+}
+
+void EglThread::setRenderType(int renderType) {
+     this->renderType=renderType;
+}
+
+/**
+ * 唤醒锁
+ * 1 首先要拿到锁
+ * 2 发送信号解锁
+ * 3 销毁锁
+ */
+void EglThread::notifyRender() {
+    /**  方法需要锁的指针 对象
+     *   & 表示引用 。引用这个变量的 就是他的指针
+     */
+    pthread_mutex_lock(&pthreadMutex);
+
+    pthread_cond_signal(&pthreadCond);
+
+    pthread_mutex_unlock(&pthreadMutex);
+
+
 }
