@@ -22,8 +22,8 @@ public: pthread_t pthread=-1;
         bool isExit = false;
         bool isStart = false ;
 
-        bool surfaceWidth = 0;
-        bool surfaceHeight =0 ;
+        int surfaceWidth = 0;
+        int surfaceHeight =0 ;
 
         typedef void (*onCreate)(void *);//定义回调函数 变量名称为onCreate  参数类型为void *  == java 的object
         onCreate  create; //成员变量用于赋值

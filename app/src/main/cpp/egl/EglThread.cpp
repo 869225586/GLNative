@@ -74,6 +74,9 @@ void EglThread::onSurfaceChange(int width, int height) {
      isChange  = true;
      surfaceHeight =height;
      surfaceWidth = width;
+     if(renderType==RENDER_HADNLE){
+         notifyRender();//如果是手动刷新那么当surface尺寸发生变化时 要重新 唤醒绘制一次 。
+     }
 }
 //将传入的回调函数 设置给 成员变量
 void EglThread::callBackOnCreate(EglThread::onCreate create, void *ctx) {
