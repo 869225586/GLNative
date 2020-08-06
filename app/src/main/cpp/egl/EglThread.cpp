@@ -37,9 +37,9 @@ void *eglThreadImpl(void *context) {
              }
 
              if(eglThread->isStart){
-                 LOGD("draw");
                  eglThread->draw(eglThread->onDrawCtx);
                  eglHelper->swapBuffers();
+                 LOGD("draw");
              }
              //// 区分自动刷新和手动刷新
              if(eglThread->renderType==RENDER_AUTO){
@@ -74,6 +74,7 @@ void EglThread::onSurfaceChange(int width, int height) {
      isChange  = true;
      surfaceHeight =height;
      surfaceWidth = width;
+     LOGD("size width is %d height is %d",surfaceWidth,surfaceHeight);
      if(renderType==RENDER_HADNLE){
          notifyRender();//如果是手动刷新那么当surface尺寸发生变化时 要重新 唤醒绘制一次 。
      }

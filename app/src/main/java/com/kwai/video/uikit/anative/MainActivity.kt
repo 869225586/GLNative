@@ -1,18 +1,17 @@
 package com.kwai.video.uikit.anative
 
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
-import android.widget.ImageView
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.kwai.video.uikit.opengl.NativeOpengl
 import com.kwai.video.uikit.opengl.WlSurfaceView
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.nio.ByteBuffer
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,8 +19,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         var wl=findViewById<WlSurfaceView>(R.id.wsurface);
-        wl.setNativeOpengl(NativeOpengl());
+
+        val nativeOpengl = NativeOpengl();
+        wl.setNativeOpengl(nativeOpengl);
         // Example of a call to a native method
+        val bitmap = BitmapFactory.decodeResource(
+            resources,
+            R.drawable.mingren
+        )
+        val fcbuffer: ByteBuffer = ByteBuffer.allocate(bitmap.height * bitmap.width * 4)
+        bitmap.copyPixelsToBuffer(fcbuffer)
+        fcbuffer.flip()
+        val pixels: ByteArray = fcbuffer.array()
+        nativeOpengl.imgData(bitmap.width, bitmap.height, pixels.size, pixels)
 
         var job=GlobalScope.launch {
             delay(600)

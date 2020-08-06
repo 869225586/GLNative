@@ -8,6 +8,7 @@ add_library( # Sets the name of the library.
              native-lib.cpp
             egl/EglHelper.cpp
             egl/EglThread.cpp
+            shader/ShaderUtil.h
             )
 find_library( # Sets the name of the path variable.
               log-lib
