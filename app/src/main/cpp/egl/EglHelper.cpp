@@ -12,8 +12,8 @@ int EglHelper::initEgl(EGLNativeWindowType windowType) {
         LOGD("egl Display error");
         return -1;
     }
-    EGLint  *version = new EGLint[2];
-    if(!eglInitialize(mEglDisplay,&version[0],&version[1])){
+    EGLint *version = new EGLint[2];
+    if (!eglInitialize(mEglDisplay,&version[0],&version[1])){
         LOGD("eglInitialize error");
         return -1;
     }

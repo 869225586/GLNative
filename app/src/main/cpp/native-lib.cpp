@@ -8,6 +8,7 @@
 #include "GLES2/gl2.h"
 #include "egl/EglThread.h"
 #include "shader/ShaderUtil.h"
+#include "matrix/MatrixUtil.h"
 
 EglHelper *wlEglHelper = NULL;
 ANativeWindow *nativeWindow = NULL;
@@ -16,9 +17,10 @@ EglThread *thread = NULL;
 const char *vertex = "attribute vec4 v_Position;\n"
                      "attribute vec2 f_Position;\n"
                      "varying vec2 ft_Position;\n"
+                     "uniform mat4 u_Matrix;\n"
                      "void main() {\n"
                      "    ft_Position = f_Position;\n"
-                     "    gl_Position = v_Position;\n"
+                     "    gl_Position = v_Position * u_Matrix;\n"
                      "}";
 
 const char *fragment = "precision mediump float;\n"
@@ -34,6 +36,7 @@ GLint vPosition;
 GLint fPosition;
 GLint sampler;
 GLuint textureId;
+GLint u_matrix;
 
 int w;
 int h;
@@ -46,13 +49,13 @@ float vertexs[] = {
         -1, 1
 
 };
-float fragments[] ={
-        1,1,
-        1,0,
-        0,1,
-        0,0
+float fragments[] = {
+        1, 1,
+        1, 0,
+        0, 1,
+        0, 0
 };
-
+float matrix[16];
 
 void onCreate(void *) {
     //创建一个加载shader 的program
@@ -60,22 +63,28 @@ void onCreate(void *) {
     LOGD("program %d", program);
     vPosition = glGetAttribLocation(program, "v_Position");//拿到shader 中的顶点坐标 变量
     LOGD("vposition %d", vPosition);
-    fPosition = glGetAttribLocation(program,"f_Position");//拿到shader中 纹理坐标
-    sampler = glGetUniformLocation(program,"sTexture"); //拿到 2d纹理
+    fPosition = glGetAttribLocation(program, "f_Position");//拿到shader中 纹理坐标
+    sampler = glGetUniformLocation(program, "sTexture"); //拿到 2d纹理
+    u_matrix = glGetUniformLocation(program, "u_Matrix");
 
-    glGenTextures(1,&textureId);//生成一个纹理id
+    glGenTextures(1, &textureId);//生成一个纹理id
 
-    glBindTexture(GL_TEXTURE_2D,textureId);//绑定纹理id
+    glBindTexture(GL_TEXTURE_2D, textureId);//绑定纹理id
+    initMatrix(matrix);
+//    rotateMatrix(-90, matrix);
+//    scaleMatrix(2, matrix);
+//    transMatrix(1, 1, matrix);
+
+//    orthoM(-3, 1, -1, 1, matrix);
 
     //设置纹理 一些参数 环绕方向
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     //过滤方式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    if(pixels != NULL)
-    {
+    if (pixels != NULL) {
         LOGD("设置图片数据");
         //设置数据
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
@@ -86,6 +95,21 @@ void onCreate(void *) {
 
 void onChange(int width, int height, void *) {
     glViewport(0, 0, width, height);
+    //计算控件的宽高比  以及图片的宽高比
+    float screen_r = 1.0 * width / height;
+    float picture_r = 1.0 * w / h;
+
+    if (screen_r > picture_r) //图片宽度缩放
+    {
+
+        float r = width / (1.0 * height / h * w);
+        orthoM(-r, r, -1, 1, matrix);
+
+    } else {//图片高度缩放
+
+        float r = height / (1.0 * width / w * h);
+        orthoM(-1, 1, -r, r, matrix);
+    }
 }
 
 void onDraw(void *) {
@@ -94,11 +118,11 @@ void onDraw(void *) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(program);
+    glUniformMatrix4fv(u_matrix, 1, GL_FALSE, matrix);//使用矩阵
 
-//    glActiveTexture(GL_TEXTURE5);//激活纹理
-//    glUniform1i(sampler, 5); //使用纹理
+    glActiveTexture(GL_TEXTURE5);//激活纹理
+    glUniform1i(sampler, 5); //使用纹理
     glBindTexture(GL_TEXTURE_2D, textureId);//绑定纹理
-
 
     glEnableVertexAttribArray(vPosition);
     //参数 说明
@@ -159,9 +183,9 @@ Java_com_kwai_video_uikit_opengl_NativeOpengl_surfaceChange(JNIEnv *env, jobject
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_kwai_video_uikit_opengl_NativeOpengl_imgData(JNIEnv *env, jobject thiz, jint width,
-        jint height,
+                                                      jint height,
                                                       jint length, jbyteArray data_) {
-    jbyte *data= env->GetByteArrayElements(data_,NULL);
+    jbyte *data = env->GetByteArrayElements(data_, NULL);
     w = width;
     h = height;
     pixels = malloc(length);//申请 length 长度的内存空间

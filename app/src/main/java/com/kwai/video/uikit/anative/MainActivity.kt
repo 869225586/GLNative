@@ -19,10 +19,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         var wl=findViewById<WlSurfaceView>(R.id.wsurface);
-
         val nativeOpengl = NativeOpengl();
         wl.setNativeOpengl(nativeOpengl);
-        // Example of a call to a native method
         val bitmap = BitmapFactory.decodeResource(
             resources,
             R.drawable.mingren
@@ -32,20 +30,22 @@ class MainActivity : AppCompatActivity() {
         fcbuffer.flip()
         val pixels: ByteArray = fcbuffer.array()
         nativeOpengl.imgData(bitmap.width, bitmap.height, pixels.size, pixels)
+    }
 
-        var job=GlobalScope.launch {
+    private fun testLaunch() {
+        var job = GlobalScope.launch {
             delay(600)
             var result1 = GlobalScope.async {
-                    getResult1()
+                getResult1()
             }
-            var result2= GlobalScope.async {
-                    getResult2()
+            var result2 = GlobalScope.async {
+                getResult2()
             }
-            var result= result1.await() + result2.await();
-            Log.e("syy","协程+$result");
+            var result = result1.await() + result2.await();
+            Log.e("syy", "协程+$result");
         }
-
     }
+
     private suspend fun getResult1(): Int {
         delay(3000)
         return 1
