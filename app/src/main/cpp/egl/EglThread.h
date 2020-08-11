@@ -66,6 +66,9 @@ public:
     void setRenderType(int renderType);//设置渲染模式
 
     void notifyRender();//用于手动渲染模式 的 更新功能
+
+    void destroy();
+
 };
 
 

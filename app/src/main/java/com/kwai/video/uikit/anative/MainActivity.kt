@@ -18,18 +18,23 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        var wl=findViewById<WlSurfaceView>(R.id.wsurface);
+        var wl = findViewById<WlSurfaceView>(R.id.wsurface);
         val nativeOpengl = NativeOpengl();
         wl.setNativeOpengl(nativeOpengl);
-        val bitmap = BitmapFactory.decodeResource(
-            resources,
-            R.drawable.mingren
-        )
-        val fcbuffer: ByteBuffer = ByteBuffer.allocate(bitmap.height * bitmap.width * 4)
-        bitmap.copyPixelsToBuffer(fcbuffer)
-        fcbuffer.flip()
-        val pixels: ByteArray = fcbuffer.array()
-        nativeOpengl.imgData(bitmap.width, bitmap.height, pixels.size, pixels)
+        wl.setOnSurfaceListener(object : WlSurfaceView.OnSurfaceListener {
+            override fun init() {
+                val bitmap = BitmapFactory.decodeResource(
+                    resources,
+                    R.drawable.mingren
+                )
+                val fcbuffer: ByteBuffer = ByteBuffer.allocate(bitmap.height * bitmap.width * 4)
+                bitmap.copyPixelsToBuffer(fcbuffer)
+                fcbuffer.flip()
+                val pixels: ByteArray = fcbuffer.array()
+                nativeOpengl.imgData(bitmap.width, bitmap.height, pixels.size, pixels)
+            }
+        });
+
     }
 
     private fun testLaunch() {

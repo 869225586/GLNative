@@ -9,6 +9,12 @@ public class WlSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     private NativeOpengl nativeOpengl;
 
+    private OnSurfaceListener onSurfaceListener;
+
+    public void setOnSurfaceListener(OnSurfaceListener onSurfaceListener) {
+        this.onSurfaceListener = onSurfaceListener;
+    }
+
     public void setNativeOpengl(NativeOpengl nativeOpengl) {
         this.nativeOpengl = nativeOpengl;
     }
@@ -31,6 +37,7 @@ public class WlSurfaceView extends SurfaceView implements SurfaceHolder.Callback
         if(nativeOpengl != null)
         {
             nativeOpengl.surfaceCreate(surfaceHolder.getSurface());
+            onSurfaceListener.init();
         }
     }
 
@@ -41,6 +48,16 @@ public class WlSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+        if(nativeOpengl != null)
+        {
+            nativeOpengl.surfaceDestroy();
+        }
+    }
+
+    public interface OnSurfaceListener
+    {
+        void init();
 
     }
+
 }

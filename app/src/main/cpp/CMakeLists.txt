@@ -10,6 +10,9 @@ add_library( # Sets the name of the library.
         egl/EglThread.cpp
         shader/ShaderUtil.h
         matrix/MatrixUtil.h
+        opengl/BaseRender.cpp
+        opengl/FilterOne.cpp
+        opengl/Opengl.cpp
         )
 find_library( # Sets the name of the path variable.
         log-lib

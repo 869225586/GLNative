@@ -105,7 +105,7 @@ void EglThread::setRenderType(int renderType) {
  * 唤醒锁
  * 1 首先要拿到锁
  * 2 发送信号解锁
- * 3 销毁锁
+ * 3 解锁
  */
 void EglThread::notifyRender() {
     /**  方法需要锁的指针 对象
@@ -117,5 +117,9 @@ void EglThread::notifyRender() {
 
     pthread_mutex_unlock(&pthreadMutex);
 
+
+}
+
+void EglThread::destroy() {
 
 }
