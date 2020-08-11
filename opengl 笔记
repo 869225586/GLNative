@@ -10,3 +10,15 @@
    想象一个 图片 有一个针 穿过 所以你转这个针   图片是左右旋转的
 
    如果沿着 x旋转 图片是前后翻转的 。
+
+
+   整体流程
+
+   1surface 生命周期 回调 jni 的OpengL
+   2 Opengl.cpp 中
+    onsurfaceCreate   创建egl 线程 初始化egl 环境 设置 egl 中 回调方法 create  change draw    在
+    opengl.cpp 中定义回调方法  ，回调方法中 调用 对应render 的几个方法   。也就是FilterOne
+    filterOne 中 在对应方法 中进行 opengl 的 shader 加载 等等
+
+    onsurfaceChange   传给 egl 线程和 render
+
