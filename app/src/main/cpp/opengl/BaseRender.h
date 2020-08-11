@@ -28,7 +28,8 @@ public:
     float *fragments; //着色器坐标
 
     GLuint program; //创建的opengl 程序
-
+    GLuint vShader; //拿到顶点 shader 用于在render里 进行释放资源
+    GLuint fShader;//拿到 纹理shader  用于在render里 进行释放资源
 public:
     BaseRender();
     ~BaseRender();
@@ -40,7 +41,9 @@ public:
 
     virtual void onDraw();
 
-    virtual void destroy();
+    virtual void destroyGl(); //销毁gl相关 需在egl 线程进行 否则销毁无效
+
+    virtual void destroyData();//销毁 数据 像素点 等可不必在 egl 线程中做销毁
 
     //设置图片数据 data 像素
     virtual void setPilex(void *data, int width, int height, int length);

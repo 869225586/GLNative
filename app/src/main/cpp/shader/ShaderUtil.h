@@ -17,7 +17,7 @@ static int loadShader(int shaderType,const char *shaderCode){
     return shader ;
 }
 
-static int createProgrm(const char *vertex , const char * fragment)
+static int createProgrm(const char *vertex , const char * fragment,GLuint *vShader,GLuint *fShader)
 {
     int program = glCreateProgram();  //创建一个program
 
@@ -25,6 +25,8 @@ static int createProgrm(const char *vertex , const char * fragment)
     int fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragment); //load 一个片元 shader
     LOGD("vertexShader is %d",vertexShader);
     LOGD("fragmentShader is %d",fragmentShader);
+    *vShader = vertexShader;
+    *fShader = fragmentShader;
 
     glAttachShader(program, vertexShader); //绑定顶点shader 到program中
     glAttachShader(program, fragmentShader);//绑定片元shader到program中

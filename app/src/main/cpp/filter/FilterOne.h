@@ -10,6 +10,7 @@
 #include "../shader/ShaderUtil.h"
 #include "../matrix/MatrixUtil.h"
 #include "../log/AndroidLog.h"
+
 //继承baseOpengl
 class FilterOne : public BaseRender {
     //声明所需要的变量
@@ -38,7 +39,9 @@ public:
 
     void onDraw();
 
-    void destroy();
+    void destroyGl();
+
+    void destroyData();
 
     void setPilex(void *data, int width, int height, int length);
 

@@ -28,7 +28,7 @@ BaseRender::~BaseRender() {
 
 }
 
-void BaseRender::destroy() {
+void BaseRender::destroyGl() {
 
 }
 
@@ -45,5 +45,9 @@ void BaseRender::onDraw() {
 }
 
 void BaseRender::setPilex(void *data, int width, int height, int length) {
+
+}
+
+void BaseRender::destroyData() {
 
 }

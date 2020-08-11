@@ -9,7 +9,7 @@
 #include "../matrix/MatrixUtil.h"
 #include "../shader/ShaderUtil.h"
 
-class WlFilterTwo  : public BaseRender{
+class WlFilterTwo : public BaseRender {
 
 public:
     GLint vPosition;
@@ -26,14 +26,18 @@ public:
 
 public:
     WlFilterTwo();
+
     ~WlFilterTwo();
+
     void onCreate();
 
     void onChange(int w, int h);
 
     void onDraw();
 
-    void destroy();
+    void destroyGl();
+
+    void destroyData();
 
     void setPilex(void *data, int width, int height, int length);
 

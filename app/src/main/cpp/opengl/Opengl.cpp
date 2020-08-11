@@ -50,7 +50,9 @@ void callback_Filter(int width, int height, void *ctx)
         //切换滤镜 先删除之前的资源   然后加载第二个shader
         if(wlOpengl->baseOpengl != NULL)
         {
-            wlOpengl->baseOpengl->destroy();
+            LOGD("释放上一个filter");
+            wlOpengl->baseOpengl->destroyGl();
+            wlOpengl->baseOpengl->destroyData();
             delete wlOpengl->baseOpengl;
             wlOpengl->baseOpengl = NULL;
         }
@@ -63,6 +65,19 @@ void callback_Filter(int width, int height, void *ctx)
     }
 }
 
+void callback_SurfaceDestroy(void *ctx)
+{
+
+    Opengl *wlOpengl = static_cast<Opengl *>(ctx);
+    if(wlOpengl != NULL)
+    {
+        if(wlOpengl->baseOpengl != NULL)
+        {
+            wlOpengl->baseOpengl->destroyGl();
+        }
+    }
+}
+
 void Opengl::onCreateSurface(JNIEnv *env, jobject surface) {
     nativeWindow = ANativeWindow_fromSurface(env, surface);
     wlEglThread = new EglThread();
@@ -71,6 +86,7 @@ void Opengl::onCreateSurface(JNIEnv *env, jobject surface) {
     wlEglThread->setChangeCallBack(callback_SurfacChange, this);
     wlEglThread->setDrawCallBack(callback_SurfaceDraw, this);
     wlEglThread->setChangeFilterCallBack(callback_Filter,this);
+    wlEglThread->setDestroyCallBack(callback_SurfaceDestroy,this);
 
     baseOpengl = new FilterOne();
     wlEglThread->onSurfaceCreate(nativeWindow);
@@ -91,7 +107,7 @@ void Opengl::onDestorySurface() {
         wlEglThread->destroy();
     }
     if (baseOpengl != NULL) {
-        baseOpengl->destroy();
+        baseOpengl->destroyData();
         delete baseOpengl;
         baseOpengl = NULL;
     }

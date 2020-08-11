@@ -62,6 +62,9 @@ void *eglThreadImpl(void *context) {
             }
 
             if (eglThread->isExit) {
+                eglHelper->destoryEgl();
+                delete  eglHelper;
+                eglHelper=NULL;
                 break;
             }
         }
@@ -127,7 +130,11 @@ void EglThread::notifyRender() {
 }
 
 void EglThread::destroy() {
-
+    isExit = true;
+    notifyRender();
+    pthread_join(pthread, NULL);
+    nativeWindow = NULL;
+    pthread = -1;
 }
 
 
@@ -139,4 +146,9 @@ void EglThread::setChangeFilterCallBack(EglThread::onChangeFilter changeFilter, 
 void EglThread::startChangeFilter() {
     isChangeFiliter=true;
     notifyRender();
+}
+
+void EglThread::setDestroyCallBack(EglThread::OnDestroy destory, void *ctx) {
+   this->onDestroy=destory;
+   this->onDestroyctx=ctx;
 }

@@ -24,7 +24,7 @@ public:
     bool isChange = false;
     bool isExit = false;
     bool isStart = false;
-    bool isChangeFiliter= false;//更新滤镜标识位
+    bool isChangeFiliter = false;//更新滤镜标识位
 
     int surfaceWidth = 0;
     int surfaceHeight = 0;
@@ -43,10 +43,16 @@ public:
     onDraw draw;
     void *onDrawCtx;
 
-    typedef void (*onChangeFilter)(int width ,int height,void *); //更新滤镜 回调方法
+    typedef void (*onChangeFilter)(int width, int height, void *); //更新滤镜 回调方法
 
     onChangeFilter changeFilter;
     void *onFilterCtx;
+
+    typedef void(*OnDestroy)(void *);
+
+    OnDestroy onDestroy;
+    void *onDestroyctx;
+
 
     int renderType = RENDER_AUTO;//默认是自动刷新
 
@@ -69,7 +75,9 @@ public:
 
     void setDrawCallBack(onDraw draw, void *ctx);
 
-    void setChangeFilterCallBack(onChangeFilter changeFilter,void * ctx);
+    void setChangeFilterCallBack(onChangeFilter changeFilter, void *ctx);
+
+    void setDestroyCallBack(OnDestroy destory, void *ctx);
 
     void setRenderType(int renderType);//设置渲染模式
 
@@ -78,7 +86,6 @@ public:
     void startChangeFilter();//开始切换滤镜
 
     void destroy();
-
 
 
 };

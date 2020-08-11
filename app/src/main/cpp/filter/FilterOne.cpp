@@ -20,7 +20,7 @@ void FilterOne::onCreate() {
                "    gl_FragColor=texture2D(sTexture, ft_Position);\n"
                "}";
     //创建一个加载shader 的program
-    program = createProgrm(vertex, fragment);
+    program = createProgrm(vertex, fragment,&vShader,&fShader);
     LOGD("program %d", program);
     vPosition = glGetAttribLocation(program, "v_Position");//拿到shader 中的顶点坐标 变量
     LOGD("vposition %d", vPosition);
@@ -115,5 +115,18 @@ void FilterOne::setMatrix(int width, int height) {
     }
 }
 
-void FilterOne::destroy() {
+void FilterOne::destroyGl() {
+    LOGE("FilterOne::destroy GL")
+    glDeleteTextures(1, &textureId);
+    glDetachShader(program, vShader);
+    glDetachShader(program, fShader);
+    glDeleteShader(vShader);
+    glDeleteShader(fShader);
+    glDeleteProgram(program);
+}
+
+void FilterOne::destroyData() {
+    if (pixels != NULL) {
+        pixels = NULL;
+    }
 }

@@ -32,7 +32,7 @@ void WlFilterTwo::onCreate() {
                "     gl_FragColor = vec4(gray, gray, gray, textureColor.w);\n"
                "}";
 
-    program = createProgrm(vertex, fragment);
+    program = createProgrm(vertex, fragment,&vShader,&fShader);
     LOGD("opengl program is %d", program);
     vPosition = glGetAttribLocation(program, "v_Position");//顶点坐标
     fPosition = glGetAttribLocation(program, "f_Position");//纹理坐标
@@ -43,8 +43,8 @@ void WlFilterTwo::onCreate() {
     glBindTexture(GL_TEXTURE_2D, textureId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
 
 }
@@ -65,13 +65,13 @@ void WlFilterTwo::setMatrix(int width, int height) {
     float screen_r = 1.0 * width / height;
     float picture_r = 1.0 * w / h;
 
-    if(screen_r > picture_r) //图片宽度缩放
+    if (screen_r > picture_r) //图片宽度缩放
     {
 
         float r = width / (1.0 * height / h * w);
         orthoM(-r, r, -1, 1, matrix);
 
-    } else{//图片高度缩放
+    } else {//图片高度缩放
 
         float r = height / (1.0 * width / w * h);
         orthoM(-1, 1, -r, r, matrix);
@@ -85,30 +85,9 @@ void WlFilterTwo::setPilex(void *data, int width, int height, int length) {
     pixels = data;
     LOGE("3 、width %d height %d %d %d", width, height, surface_width, surface_height);
 
-    if(surface_height > 0 && surface_width > 0)
-    {
+    if (surface_height > 0 && surface_width > 0) {
         setMatrix(surface_width, surface_height);
     }
-
-}
-
-void WlFilterTwo::destroy() {
-
-    LOGE("WlFilterTwo::destroy")
-    if(program > 0)
-    {
-        glDeleteProgram(program);
-    }
-    if(textureId > 0)
-    {
-        glDeleteTextures(1, &textureId);
-    }
-
-    if(pixels != NULL)
-    {
-        pixels = NULL;
-    }
-
 
 }
 
@@ -126,8 +105,7 @@ void WlFilterTwo::onDraw() {
 
     glBindTexture(GL_TEXTURE_2D, textureId);
 
-    if(pixels != NULL)
-    {
+    if (pixels != NULL) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     }
 
@@ -140,4 +118,21 @@ void WlFilterTwo::onDraw() {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void WlFilterTwo::destroyData() {
+    if (pixels != NULL) {
+        pixels = NULL;
+    }
+}
+
+
+void WlFilterTwo::destroyGl() {
+    LOGE("FilterTwo::destroy GL")
+    glDeleteTextures(1, &textureId);
+    glDetachShader(program, vShader);
+    glDetachShader(program, fShader);
+    glDeleteShader(vShader);
+    glDeleteShader(fShader);
+    glDeleteProgram(program);
 }
