@@ -6,7 +6,7 @@
 #define NATIVE_FILTERONE_H
 
 
-#include "BaseRender.h"
+#include "../opengl/BaseRender.h"
 #include "../shader/ShaderUtil.h"
 #include "../matrix/MatrixUtil.h"
 #include "../log/AndroidLog.h"

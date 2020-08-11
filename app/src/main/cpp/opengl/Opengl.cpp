@@ -42,14 +42,35 @@ void callback_SurfaceDraw(void *ctx)
         }
     }
 }
+void callback_Filter(int width, int height, void *ctx)
+{
+    Opengl *wlOpengl = static_cast<Opengl *>(ctx);
+    if(wlOpengl != NULL)
+    {
+        //切换滤镜 先删除之前的资源   然后加载第二个shader
+        if(wlOpengl->baseOpengl != NULL)
+        {
+            wlOpengl->baseOpengl->destroy();
+            delete wlOpengl->baseOpengl;
+            wlOpengl->baseOpengl = NULL;
+        }
+        wlOpengl->baseOpengl=new WlFilterTwo();
+        wlOpengl->baseOpengl->onCreate();
+        wlOpengl->baseOpengl->onChange(width,height);
+        wlOpengl->baseOpengl->setPilex(wlOpengl->pilex, wlOpengl->pic_width, wlOpengl->pic_height, 0);
+        wlOpengl->wlEglThread->notifyRender();
+
+    }
+}
 
 void Opengl::onCreateSurface(JNIEnv *env, jobject surface) {
     nativeWindow = ANativeWindow_fromSurface(env, surface);
     wlEglThread = new EglThread();
     wlEglThread->setRenderType(RENDER_HADNLE);
-    wlEglThread->callBackOnCreate(callback_SurfaceCrete, this);
-    wlEglThread->callBackOnChange(callback_SurfacChange, this);
-    wlEglThread->callBackOnDraw(callback_SurfaceDraw, this);
+    wlEglThread->setCreateCallBack(callback_SurfaceCrete, this);
+    wlEglThread->setChangeCallBack(callback_SurfacChange, this);
+    wlEglThread->setDrawCallBack(callback_SurfaceDraw, this);
+    wlEglThread->setChangeFilterCallBack(callback_Filter,this);
 
     baseOpengl = new FilterOne();
     wlEglThread->onSurfaceCreate(nativeWindow);
@@ -83,12 +104,9 @@ void Opengl::onDestorySurface() {
 void Opengl::setPilex(void *data, int width, int height, int length) {
     pic_width = width;
     pic_height = height;
-    LOGD("设置图片数据0");
     pilex = malloc(length);
     memcpy(pilex, data, length);
-    LOGD("设置图片数据1");
     if (baseOpengl != NULL) {
-        LOGD("设置图片数据2");
         baseOpengl->setPilex(pilex, width, height, length);
     }
     if (wlEglThread != NULL) {
@@ -103,4 +121,10 @@ Opengl::Opengl() {
 
 Opengl::~Opengl() {
 
+}
+
+void Opengl::onChangeFilter() {
+   if(wlEglThread!=NULL){
+       wlEglThread->startChangeFilter();
+   }
 }

@@ -3,6 +3,7 @@ package com.kwai.video.uikit.anative
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.kwai.video.uikit.opengl.NativeOpengl
 import com.kwai.video.uikit.opengl.WlSurfaceView
@@ -14,12 +15,14 @@ import java.nio.ByteBuffer
 
 
 class MainActivity : AppCompatActivity() {
-
+     lateinit var nativeOpengl:NativeOpengl;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         var wl = findViewById<WlSurfaceView>(R.id.wsurface);
-        val nativeOpengl = NativeOpengl();
+
+        nativeOpengl = NativeOpengl();
+
         wl.setNativeOpengl(nativeOpengl);
         wl.setOnSurfaceListener(object : WlSurfaceView.OnSurfaceListener {
             override fun init() {
@@ -68,5 +71,10 @@ class MainActivity : AppCompatActivity() {
         init {
             System.loadLibrary("native-lib")
         }
+    }
+
+    fun changeFilter(view: View) {
+        nativeOpengl.changeFilter();
+
     }
 }

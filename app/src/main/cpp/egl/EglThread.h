@@ -24,6 +24,7 @@ public:
     bool isChange = false;
     bool isExit = false;
     bool isStart = false;
+    bool isChangeFiliter= false;//更新滤镜标识位
 
     int surfaceWidth = 0;
     int surfaceHeight = 0;
@@ -42,6 +43,11 @@ public:
     onDraw draw;
     void *onDrawCtx;
 
+    typedef void (*onChangeFilter)(int width ,int height,void *); //更新滤镜 回调方法
+
+    onChangeFilter changeFilter;
+    void *onFilterCtx;
+
     int renderType = RENDER_AUTO;//默认是自动刷新
 
     pthread_mutex_t pthreadMutex; //线程锁
@@ -57,17 +63,23 @@ public:
 
     void onSurfaceChange(int width, int height);
 
-    void callBackOnCreate(onCreate create, void *ctx);
+    void setCreateCallBack(onCreate create, void *ctx);
 
-    void callBackOnChange(onChange change, void *ctx);
+    void setChangeCallBack(onChange change, void *ctx);
 
-    void callBackOnDraw(onDraw draw, void *ctx);
+    void setDrawCallBack(onDraw draw, void *ctx);
+
+    void setChangeFilterCallBack(onChangeFilter changeFilter,void * ctx);
 
     void setRenderType(int renderType);//设置渲染模式
 
     void notifyRender();//用于手动渲染模式 的 更新功能
 
+    void startChangeFilter();//开始切换滤镜
+
     void destroy();
+
+
 
 };
 

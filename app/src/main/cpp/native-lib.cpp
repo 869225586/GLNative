@@ -44,4 +44,9 @@ Java_com_kwai_video_uikit_opengl_NativeOpengl_imgData(JNIEnv *env, jobject thiz,
 JNIEXPORT void JNICALL
 Java_com_kwai_video_uikit_opengl_NativeOpengl_surfaceDestroy(JNIEnv *env, jobject thiz) {
     opengl->onDestorySurface();
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_kwai_video_uikit_opengl_NativeOpengl_changeFilter(JNIEnv *env, jobject thiz) {
+    // TODO: implement changeFilter()
+    opengl->onChangeFilter();
 }

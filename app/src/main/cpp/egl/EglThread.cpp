@@ -37,6 +37,12 @@ void *eglThreadImpl(void *context) {
                                   eglThread->onChangeCtx);
             }
 
+            if(eglThread->isChangeFiliter){
+                LOGD("eglThread call Filter");
+                eglThread->isChangeFiliter= false;
+                eglThread->changeFilter(eglThread->surfaceWidth,eglThread->surfaceHeight,eglThread->onFilterCtx);
+            }
+
             if (eglThread->isStart) {
                 eglThread->draw(eglThread->onDrawCtx);
                 eglHelper->swapBuffers();
@@ -82,17 +88,17 @@ void EglThread::onSurfaceChange(int width, int height) {
 }
 
 //将传入的回调函数 设置给 成员变量
-void EglThread::callBackOnCreate(EglThread::onCreate create, void *ctx) {
+void EglThread::setCreateCallBack(EglThread::onCreate create, void *ctx) {
     this->create = create;
     this->onCreateCtx = ctx;
 }
 
-void EglThread::callBackOnChange(EglThread::onChange change, void *ctx) {
+void EglThread::setChangeCallBack(EglThread::onChange change, void *ctx) {
     this->change = change;
     this->onChangeCtx = ctx;
 }
 
-void EglThread::callBackOnDraw(EglThread::onDraw draw, void *ctx) {
+void EglThread::setDrawCallBack(EglThread::onDraw draw, void *ctx) {
     this->draw = draw;
     this->onDrawCtx = ctx;
 }
@@ -122,4 +128,15 @@ void EglThread::notifyRender() {
 
 void EglThread::destroy() {
 
+}
+
+
+void EglThread::setChangeFilterCallBack(EglThread::onChangeFilter changeFilter, void *ctx) {
+     this->changeFilter=changeFilter ;
+     this->onFilterCtx =ctx;
+}
+
+void EglThread::startChangeFilter() {
+    isChangeFiliter=true;
+    notifyRender();
 }

@@ -8,7 +8,9 @@
 #include "../egl/EglThread.h"
 #include "android/native_window.h"
 #include "android/native_window_jni.h"
-#include "FilterOne.h"
+#include "../filter/FilterOne.h"
+#include "../filter/WlFilterTwo.h"
+
 #include "BaseRender.h"
 
 class Opengl {
@@ -30,6 +32,8 @@ public:
     void onChangeSurface(int width, int height);
 
     void onDestorySurface();
+
+    void onChangeFilter();
 
     void setPilex(void *data, int width, int height, int length);
 };

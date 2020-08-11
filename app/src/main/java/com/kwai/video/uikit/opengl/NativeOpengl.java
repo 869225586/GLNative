@@ -11,9 +11,11 @@ public class NativeOpengl {
 
     public native void surfaceCreate(Surface surface);
 
-    public native  void surfaceChange(int i1, int i2);
+    public native void surfaceChange(int i1, int i2);
 
-    public native  void surfaceDestroy();
+    public native void surfaceDestroy();
+
+    public native void changeFilter();
 
     public native void imgData(int w, int h, int length, byte[] data);
 }
