@@ -12,7 +12,7 @@
 #include "../filter/WlFilterTwo.h"
 #include "../filter/FilterYuv.h"
 #include "BaseRender.h"
-
+#include "../vbo/FilterVboYuv.h"
 class Opengl {
 public:
     EglThread *wlEglThread = NULL;

@@ -14,12 +14,14 @@ BaseRender::BaseRender() {
                  -1, -1,
                  -1, 1};
     memcpy(vertexs, v, sizeof(v));
+    vertexSize= sizeof(v);
 
     float f[] = {1, 1,
                  1, 0,
                  0, 1,
                  0, 0};
     memcpy(fragments, f, sizeof(f));
+    fragmentSize = sizeof(f);
 }
 
 BaseRender::~BaseRender() {

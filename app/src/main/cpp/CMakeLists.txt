@@ -15,6 +15,7 @@ add_library( # Sets the name of the library.
         opengl/Opengl.cpp
         filter/WlFilterTwo.cpp
         filter/FilterYuv.cpp
+        vbo/FilterVboYuv.cpp
         )
 find_library( # Sets the name of the path variable.
         log-lib

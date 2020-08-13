@@ -30,6 +30,10 @@ public:
     GLuint program; //创建的opengl 程序
     GLuint vShader; //拿到顶点 shader 用于在render里 进行释放资源
     GLuint fShader;//拿到 纹理shader  用于在render里 进行释放资源
+
+    int vertexSize;//顶点坐标字节数
+    int fragmentSize;//纹理坐标字节数
+
 public:
     BaseRender();
 

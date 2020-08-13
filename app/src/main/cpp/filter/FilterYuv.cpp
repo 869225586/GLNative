@@ -53,6 +53,10 @@ void FilterYuv::onCreate() {
 
     u_matrix = glGetUniformLocation(program, "u_Matrix");
 
+    glGenBuffers(1, vbos); //启用vbo获取vboid
+    vboId = vbos[0];
+    glBindBuffer(vboId, GL_ARRAY_BUFFER); //绑定vbo
+
     glGenTextures(3, textures);
 
     for (int i = 0; i < 3; i++) {

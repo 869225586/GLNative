@@ -2,7 +2,7 @@
 // Created by edz on 2020/8/13.
 //
 
-#ifndef NATIVE_FILTERYUV_H
+#ifndef NATIVE_FILTERVBOYUV_H
 #define NATIVE_FILTERYUV_H
 
 #include "../opengl/BaseRender.h"
@@ -20,6 +20,8 @@ public:
     GLuint sampler_v;//shader v 变量
 
     GLuint textures[3];//上面三个纹理的数组
+    GLuint vbos[1]; //vbo
+    GLuint vboId; //vbo id
 
     float matrix[16];
     void *y = NULL; //y 数据
@@ -51,4 +53,4 @@ public:
 };
 
 
-#endif //NATIVE_FILTERYUV_H
+#endif //NATIVE_FILTERVBOYUV_H
