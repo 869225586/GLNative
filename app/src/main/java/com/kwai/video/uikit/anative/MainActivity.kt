@@ -15,29 +15,34 @@ import java.nio.ByteBuffer
 
 
 class MainActivity : AppCompatActivity() {
-     lateinit var nativeOpengl:NativeOpengl;
+     lateinit var nativeOpengl:NativeOpengl
+    lateinit var drawableList :List<Int>;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         var wl = findViewById<WlSurfaceView>(R.id.wsurface);
-
+        drawableList = listOf(R.drawable.mingren,R.drawable.img_1,R.drawable.img_2,R.drawable.img_3);
         nativeOpengl = NativeOpengl();
 
         wl.setNativeOpengl(nativeOpengl);
         wl.setOnSurfaceListener(object : WlSurfaceView.OnSurfaceListener {
             override fun init() {
-                val bitmap = BitmapFactory.decodeResource(
-                    resources,
-                    R.drawable.mingren
-                )
-                val fcbuffer: ByteBuffer = ByteBuffer.allocate(bitmap.height * bitmap.width * 4)
-                bitmap.copyPixelsToBuffer(fcbuffer)
-                fcbuffer.flip()
-                val pixels: ByteArray = fcbuffer.array()
-                nativeOpengl.imgData(bitmap.width, bitmap.height, pixels.size, pixels)
+                loadDrawable(R.drawable.mingren)
             }
         });
 
+    }
+
+    private fun loadDrawable (drawabldid :Int) {
+        val bitmap = BitmapFactory.decodeResource(
+            resources,
+            drawabldid
+        )
+        val fcbuffer: ByteBuffer = ByteBuffer.allocate(bitmap.height * bitmap.width * 4)
+        bitmap.copyPixelsToBuffer(fcbuffer)
+        fcbuffer.flip()
+        val pixels: ByteArray = fcbuffer.array()
+        nativeOpengl.imgData(bitmap.width, bitmap.height, pixels.size, pixels)
     }
 
     private fun testLaunch() {
@@ -75,6 +80,12 @@ class MainActivity : AppCompatActivity() {
 
     fun changeFilter(view: View) {
         nativeOpengl.changeFilter();
+
+    }
+    var index=0
+    fun changeTexture(view: View) {
+        index++;
+        loadDrawable(drawableList[index%4]);
 
     }
 }

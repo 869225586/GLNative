@@ -37,6 +37,7 @@ public class WlSurfaceView extends SurfaceView implements SurfaceHolder.Callback
         if(nativeOpengl != null)
         {
             nativeOpengl.surfaceCreate(surfaceHolder.getSurface());
+            if(onSurfaceListener!=null)
             onSurfaceListener.init();
         }
     }

@@ -32,6 +32,7 @@ public:
     GLuint fShader;//拿到 纹理shader  用于在render里 进行释放资源
 public:
     BaseRender();
+
     ~BaseRender();
 
 //    virtual //虚函数 类似java 的抽象方法 由 子类实现
@@ -48,6 +49,7 @@ public:
     //设置图片数据 data 像素
     virtual void setPilex(void *data, int width, int height, int length);
 
+    virtual void setYuvData(void *y, void *u, void *v, int width, int height);
 };
 
 

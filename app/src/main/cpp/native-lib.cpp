@@ -52,4 +52,22 @@ Java_com_kwai_video_uikit_opengl_NativeOpengl_changeFilter(JNIEnv *env, jobject 
     // TODO: implement changeFilter()
     opengl->onChangeFilter();
 
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_kwai_video_uikit_opengl_NativeOpengl_setYuvData(JNIEnv *env, jobject thiz, jbyteArray y_,
+                                                         jbyteArray u_, jbyteArray v_, jint w,
+                                                         jint h) {
+    jbyte  *y = env->GetByteArrayElements(y_,NULL);
+    jbyte *u = env->GetByteArrayElements(u_, NULL);
+    jbyte *v = env->GetByteArrayElements(v_, NULL);
+
+    // TODO
+    if(opengl != NULL)
+    {
+        opengl->setYuvData(y, u, v, w, h);
+    }
+
+    env->ReleaseByteArrayElements(y_, y, 0);
+    env->ReleaseByteArrayElements(u_, u, 0);
+    env->ReleaseByteArrayElements(v_, v, 0);
 }

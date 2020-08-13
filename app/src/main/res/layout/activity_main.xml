@@ -10,17 +10,35 @@
 		android:layout_height="match_parent"
 		android:id="@+id/wsurface"
 		/>
-	<TextView
-		android:id="@+id/sample_text"
+	<LinearLayout
 		android:layout_width="match_parent"
-		android:layout_height="50dp"
-		android:gravity="center"
-		android:textSize="16sp"
-		android:background="#ffffff"
-		android:text="Hello World!"
-		android:onClick="changeFilter"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		>
+		<TextView
+			android:id="@+id/sample_text"
+			android:layout_width="wrap_content"
+			android:layout_height="50dp"
+			android:gravity="center"
+			android:textSize="16sp"
+			android:background="#ffffff"
+			android:text="Hello World!"
+			android:onClick="changeFilter"
+			android:layout_alignParentBottom="true"
+			/>
 
-		android:layout_alignParentBottom="true"
-	/>
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="50dp"
+			android:gravity="center"
+			android:textSize="16sp"
+			android:background="#ffffff"
+			android:text="切换纹理"
+			android:onClick="changeTexture"
+			android:layout_alignParentBottom="true"
+			/>
+
+	</LinearLayout>
+
 
 </RelativeLayout>

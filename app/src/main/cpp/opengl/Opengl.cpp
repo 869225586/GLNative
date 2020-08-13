@@ -88,7 +88,7 @@ void Opengl::onCreateSurface(JNIEnv *env, jobject surface) {
     wlEglThread->setChangeFilterCallBack(callback_Filter,this);
     wlEglThread->setDestroyCallBack(callback_SurfaceDestroy,this);
 
-    baseOpengl = new FilterOne();
+    baseOpengl = new FilterYuv();
     wlEglThread->onSurfaceCreate(nativeWindow);
 }
 
@@ -120,6 +120,11 @@ void Opengl::onDestorySurface() {
 void Opengl::setPilex(void *data, int width, int height, int length) {
     pic_width = width;
     pic_height = height;
+    if(pilex != NULL)
+    {
+        free(pilex);
+        pilex = NULL;
+    }
     pilex = malloc(length);
     memcpy(pilex, data, length);
     if (baseOpengl != NULL) {
@@ -143,4 +148,16 @@ void Opengl::onChangeFilter() {
    if(wlEglThread!=NULL){
        wlEglThread->startChangeFilter();
    }
+}
+
+void Opengl::setYuvData(void *y, void *u, void *v, int w, int h) {
+
+    if(baseOpengl != NULL)
+    {
+        baseOpengl->setYuvData(y,u,v,w,h);
+    }
+    if(wlEglThread != NULL)
+    {
+        wlEglThread->notifyRender();
+    }
 }

@@ -10,7 +10,7 @@
 #include "android/native_window_jni.h"
 #include "../filter/FilterOne.h"
 #include "../filter/WlFilterTwo.h"
-
+#include "../filter/FilterYuv.h"
 #include "BaseRender.h"
 
 class Opengl {
@@ -25,6 +25,7 @@ public:
 
 public:
     Opengl();
+
     ~Opengl();
 
     void onCreateSurface(JNIEnv *env, jobject surface);
@@ -34,6 +35,8 @@ public:
     void onDestorySurface();
 
     void onChangeFilter();
+
+    void setYuvData(void *y, void *u, void *v, int w, int h);
 
     void setPilex(void *data, int width, int height, int length);
 };

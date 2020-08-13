@@ -51,3 +51,7 @@ void BaseRender::setPilex(void *data, int width, int height, int length) {
 void BaseRender::destroyData() {
 
 }
+
+void BaseRender::setYuvData(void *y, void *u, void *v, int width, int height) {
+
+}
