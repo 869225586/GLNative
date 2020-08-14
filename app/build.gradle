@@ -12,11 +12,14 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
                 cppFlags ""
+                abiFilters "armeabi-v7a", "x86"
             }
         }
     }
@@ -29,10 +32,31 @@ android {
     }
     externalNativeBuild {
         cmake {
-            path "src/main/cpp/CMakeLists.txt"
+            path "CMakeLists.txt"
             version "3.10.2"
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
+    /*// Fix: More than one file was found 解决报错提示 so 重复的问题
+    //可以配置三个选项
+    //pickFirst 使用第一个
+    //merge 合并
+    //exclude 排除
+    packagingOptions {
+        pickFirst 'lib/armeabi-v7a/libavcodec-57.so'
+        pickFirst 'lib/armeabi-v7a/libavfilter-6.so'
+        pickFirst 'lib/armeabi-v7a/libswscale-4.so'
+        pickFirst 'lib/armeabi-v7a/libavdevice-57.so'
+        pickFirst 'lib/armeabi-v7a/libswresample-2.so'
+        pickFirst 'lib/armeabi-v7a/libavutil-55.so'
+        pickFirst 'lib/armeabi-v7a/libavformat-57.so'
+        pickFirst 'lib/armeabi-v7a/libpostproc-54.so'
+    }*/
+
 }
 
 dependencies {
