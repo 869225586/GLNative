@@ -107,6 +107,10 @@ void Opengl::onDestorySurface() {
         ANativeWindow_release(nativeWindow);
         nativeWindow = NULL;
     }
+    if(ffmpeg!=NULL){
+        ffmpeg->release();
+        ffmpeg=NULL;
+    }
 }
 
 void Opengl::setPilex(void *data, int width, int height, int length) {

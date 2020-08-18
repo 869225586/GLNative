@@ -19,7 +19,7 @@ VideoPlayer::~VideoPlayer() {
 //视频 解码
 void *playVideo(void *data) {
     VideoPlayer *videoPlayer = static_cast<VideoPlayer *>(data);
-    while (videoPlayer->playStatus != NULL) {
+    while (videoPlayer->playStatus != NULL&&!videoPlayer->playStatus->exit) {
         if (videoPlayer->playStatus->seek) {
             av_usleep(1000 * 100);
             continue;
@@ -146,6 +146,29 @@ double VideoPlayer::getDelayTime(double diff) {
 }
 
 void VideoPlayer::release() {
+    if(queue != NULL)
+    {
+        delete(queue);
+        queue = NULL;
+    }
+    if(abs_ctx != NULL)
+    {
+        av_bsf_free(&abs_ctx);
+        abs_ctx = NULL;
+    }
+    if(avCodecContext != NULL)
+    {
+        pthread_mutex_lock(&codecMutex);
+        avcodec_close(avCodecContext);
+        avcodec_free_context(&avCodecContext);
+        avCodecContext = NULL;
+        pthread_mutex_unlock(&codecMutex);
+    }
+
+    if(playStatus != NULL)
+    {
+        playStatus = NULL;
+    }
 
 }
 

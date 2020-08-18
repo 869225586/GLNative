@@ -207,17 +207,17 @@ void FFmpeg::seek(int64_t seconds) {
             audioPlayer->clock = 0;
             audioPlayer->preTime = 0;
             pthread_mutex_lock(&audioPlayer->codecMutex);
-//            avcodec_flush_buffers(audioPlayer->avCodecContext);
+            avcodec_flush_buffers(audioPlayer->avCodecContext);
             pthread_mutex_unlock(&audioPlayer->codecMutex);
         }
-        /*if(video != NULL)
+        if(videoPlayer != NULL)
         {
-            video->queue->clearAvpacket();
-            video->clock = 0;
-            pthread_mutex_lock(&video->codecMutex);
-            avcodec_flush_buffers(video->avCodecContext);
-            pthread_mutex_unlock(&video->codecMutex);
-        }*/
+            videoPlayer->queue->clearQueue();
+            videoPlayer->clock = 0;
+            pthread_mutex_lock(&videoPlayer->codecMutex);
+            avcodec_flush_buffers(videoPlayer->avCodecContext);
+            pthread_mutex_unlock(&videoPlayer->codecMutex);
+        }
         pthread_mutex_unlock(&seek_mutex);
         playStatus->seek = false;
     }
@@ -256,6 +256,7 @@ void FFmpeg::release() {
     LOGE("开始释放Ffmpe");
     playStatus->exit = true;
     pthread_mutex_lock(&init_mutex);
+    //如果 没有播放完毕等一秒再退出 防止直接释放资源导致指针问题
     int sleepCount = 0;
     while (!exit) {
         if (sleepCount > 1000) {
@@ -273,12 +274,12 @@ void FFmpeg::release() {
     }
 
     LOGE("释放 video");
-    /* if(video != NULL)
+     if(videoPlayer != NULL)
      {
-         video->release();
-         delete(video);
-         video = NULL;
-     }*/
+         videoPlayer->release();
+         delete(videoPlayer);
+         videoPlayer = NULL;
+     }
     LOGE("释放 封装格式上下文");
     if (pFormatCtx != NULL) {
         avformat_close_input(&pFormatCtx);
