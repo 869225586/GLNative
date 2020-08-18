@@ -4,76 +4,69 @@
 
 #include "Opengl.h"
 
-void callback_SurfaceCrete(void *ctx)
-{
+void callback_yuv(void *y, void *u, void *v, int width, int height, void *ctx) {
+    Opengl *opengl = static_cast<Opengl *>(ctx);
+    opengl->setYuvData(y, u, v, width, height);
+}
 
+void callback_SurfaceCrete(void *ctx) {
     Opengl *wlOpengl = static_cast<Opengl *>(ctx);
 
-    if(wlOpengl != NULL)
-    {
-        if(wlOpengl->baseOpengl != NULL)
-        {
-            wlOpengl->baseOpengl->onCreate();
+    if (wlOpengl != NULL) {
+        if (wlOpengl->baseRender != NULL) {
+            wlOpengl->baseRender->onCreate();
+        }
+    }
+    wlOpengl->ffmpeg->preapared();
+    wlOpengl->ffmpeg->videoPlayer->setCallYUV(callback_yuv, wlOpengl);
+}
+
+void callback_SurfacChange(int width, int height, void *ctx) {
+    Opengl *wlOpengl = static_cast<Opengl *>(ctx);
+    if (wlOpengl != NULL) {
+        if (wlOpengl->baseRender != NULL) {
+            wlOpengl->baseRender->onChange(width, height);
         }
     }
 }
 
-void callback_SurfacChange(int width, int height, void *ctx)
-{
+void callback_SurfaceDraw(void *ctx) {
+
     Opengl *wlOpengl = static_cast<Opengl *>(ctx);
-    if(wlOpengl != NULL)
-    {
-        if(wlOpengl->baseOpengl != NULL)
-        {
-            wlOpengl->baseOpengl->onChange(width, height);
+    if (wlOpengl != NULL) {
+        if (wlOpengl->baseRender != NULL) {
+            wlOpengl->baseRender->onDraw();
         }
     }
 }
 
-void callback_SurfaceDraw(void *ctx)
-{
-
+void callback_Filter(int width, int height, void *ctx) {
     Opengl *wlOpengl = static_cast<Opengl *>(ctx);
-    if(wlOpengl != NULL)
-    {
-        if(wlOpengl->baseOpengl != NULL)
-        {
-            wlOpengl->baseOpengl->onDraw();
-        }
-    }
-}
-void callback_Filter(int width, int height, void *ctx)
-{
-    Opengl *wlOpengl = static_cast<Opengl *>(ctx);
-    if(wlOpengl != NULL)
-    {
+    if (wlOpengl != NULL) {
         //切换滤镜 先删除之前的资源   然后加载第二个shader
-        if(wlOpengl->baseOpengl != NULL)
-        {
+        if (wlOpengl->baseRender != NULL) {
             LOGD("释放上一个filter");
-            wlOpengl->baseOpengl->destroyGl();
-            wlOpengl->baseOpengl->destroyData();
-            delete wlOpengl->baseOpengl;
-            wlOpengl->baseOpengl = NULL;
+            wlOpengl->baseRender->destroyGl();
+            wlOpengl->baseRender->destroyData();
+            delete wlOpengl->baseRender;
+            wlOpengl->baseRender = NULL;
         }
-        wlOpengl->baseOpengl=new WlFilterTwo();
-        wlOpengl->baseOpengl->onCreate();
-        wlOpengl->baseOpengl->onChange(width,height);
-        wlOpengl->baseOpengl->setPilex(wlOpengl->pilex, wlOpengl->pic_width, wlOpengl->pic_height, 0);
+        wlOpengl->baseRender = new WlFilterTwo();
+        wlOpengl->baseRender->onCreate();
+        wlOpengl->baseRender->onChange(width, height);
+        wlOpengl->baseRender->setPilex(wlOpengl->pilex, wlOpengl->pic_width, wlOpengl->pic_height,
+                                       0);
         wlOpengl->wlEglThread->notifyRender();
 
     }
 }
 
-void callback_SurfaceDestroy(void *ctx)
-{
+void callback_SurfaceDestroy(void *ctx) {
 
     Opengl *wlOpengl = static_cast<Opengl *>(ctx);
-    if(wlOpengl != NULL)
-    {
-        if(wlOpengl->baseOpengl != NULL)
-        {
-            wlOpengl->baseOpengl->destroyGl();
+    if (wlOpengl != NULL) {
+        if (wlOpengl->baseRender != NULL) {
+            wlOpengl->baseRender->destroyGl();
         }
     }
 }
@@ -85,18 +78,17 @@ void Opengl::onCreateSurface(JNIEnv *env, jobject surface) {
     wlEglThread->setCreateCallBack(callback_SurfaceCrete, this);
     wlEglThread->setChangeCallBack(callback_SurfacChange, this);
     wlEglThread->setDrawCallBack(callback_SurfaceDraw, this);
-    wlEglThread->setChangeFilterCallBack(callback_Filter,this);
-    wlEglThread->setDestroyCallBack(callback_SurfaceDestroy,this);
+    wlEglThread->setChangeFilterCallBack(callback_Filter, this);
+    wlEglThread->setDestroyCallBack(callback_SurfaceDestroy, this);
 
-    baseOpengl = new FilFilterVboYuv();
     wlEglThread->onSurfaceCreate(nativeWindow);
 }
 
 void Opengl::onChangeSurface(int width, int height) {
     if (wlEglThread != NULL) {
-        if (baseOpengl != NULL) {
-            baseOpengl->surface_width = width;
-            baseOpengl->surface_height = height;
+        if (baseRender != NULL) {
+            baseRender->surface_width = width;
+            baseRender->surface_height = height;
         }
         wlEglThread->onSurfaceChange(width, height);
     }
@@ -106,10 +98,10 @@ void Opengl::onDestorySurface() {
     if (wlEglThread != NULL) {
         wlEglThread->destroy();
     }
-    if (baseOpengl != NULL) {
-        baseOpengl->destroyData();
-        delete baseOpengl;
-        baseOpengl = NULL;
+    if (baseRender != NULL) {
+        baseRender->destroyData();
+        delete baseRender;
+        baseRender = NULL;
     }
     if (nativeWindow != NULL) {
         ANativeWindow_release(nativeWindow);
@@ -120,15 +112,14 @@ void Opengl::onDestorySurface() {
 void Opengl::setPilex(void *data, int width, int height, int length) {
     pic_width = width;
     pic_height = height;
-    if(pilex != NULL)
-    {
+    if (pilex != NULL) {
         free(pilex);
         pilex = NULL;
     }
     pilex = malloc(length);
     memcpy(pilex, data, length);
-    if (baseOpengl != NULL) {
-        baseOpengl->setPilex(pilex, width, height, length);
+    if (baseRender != NULL) {
+        baseRender->setPilex(pilex, width, height, length);
     }
     if (wlEglThread != NULL) {
         wlEglThread->notifyRender();
@@ -137,7 +128,7 @@ void Opengl::setPilex(void *data, int width, int height, int length) {
 }
 
 Opengl::Opengl() {
-
+    baseRender = new FilFilterVboYuv();
 }
 
 Opengl::~Opengl() {
@@ -145,19 +136,22 @@ Opengl::~Opengl() {
 }
 
 void Opengl::onChangeFilter() {
-   if(wlEglThread!=NULL){
-       wlEglThread->startChangeFilter();
-   }
+    if (wlEglThread != NULL) {
+        wlEglThread->startChangeFilter();
+    }
 }
 
 void Opengl::setYuvData(void *y, void *u, void *v, int w, int h) {
-
-    if(baseOpengl != NULL)
-    {
-        baseOpengl->setYuvData(y,u,v,w,h);
+    if (baseRender != NULL) {
+        baseRender->setYuvData(y, u, v, w, h);
     }
-    if(wlEglThread != NULL)
-    {
+    if (wlEglThread != NULL) {
         wlEglThread->notifyRender();
     }
 }
+
+void Opengl::preparedFromFFmpeg(PlayStatus *playStatus, const char *url) {
+    ffmpeg = new FFmpeg(playStatus, url);
+}
+
+

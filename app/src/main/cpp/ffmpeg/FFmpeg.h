@@ -6,14 +6,15 @@
 #define NATIVE_FFMPEG_H
 
 #include "pthread.h"
-#include "../include/libavcodec/avcodec.h"
 #include "../log/AndroidLog.h"
+#include "AudioPlayer.h"
+#include "VideoPlayer.h"
+
 extern "C"
 {
 #include "../include/libavformat/avformat.h"
-#include "../include/libavutil/time.h"
+#include <../include/libavutil/time.h>
 };
-
 
 class FFmpeg {
 public:
@@ -28,8 +29,15 @@ public:
 
     const AVBitStreamFilter *bsFilter = NULL; //用于获取视频一些 格式等 过滤器
 
+    AudioPlayer *audioPlayer = NULL;
+
+    VideoPlayer *videoPlayer = NULL;
+
+    PlayStatus *playStatus = NULL;
+
+    bool isCreateVideo = false;
 public:
-    FFmpeg(const char *url);
+    FFmpeg(PlayStatus *playStatus, const char *url);
 
     ~FFmpeg();
 
@@ -50,7 +58,8 @@ public:
     int getCodecContext(AVCodecParameters *codecpar, AVCodecContext **avCodecContext);
 
     void exitByInitError(); //初始化出错 退出
+
 };
 
 
-#endif //NATIVE_FFMPEG_H
+#endif NATIVE_FFMPEG_H

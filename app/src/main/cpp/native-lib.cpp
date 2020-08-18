@@ -3,8 +3,9 @@
 #include "log/AndroidLog.h"
 
 #include "opengl/Opengl.h"
-
+#include "ffmpeg/PlayStatus.h"
 Opengl *opengl;
+PlayStatus *playStatus;
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_kwai_video_uikit_anative_MainActivity_stringFromJNI(
         JNIEnv *env,
@@ -70,4 +71,12 @@ Java_com_kwai_video_uikit_opengl_NativeOpengl_setYuvData(JNIEnv *env, jobject th
     env->ReleaseByteArrayElements(y_, y, 0);
     env->ReleaseByteArrayElements(u_, u, 0);
     env->ReleaseByteArrayElements(v_, v, 0);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_kwai_video_uikit_opengl_NativeOpengl_playFromFFmpeg(JNIEnv *env, jobject thiz,
+                                                             jstring url) {
+    playStatus = new PlayStatus();
+    const char *source = env->GetStringUTFChars(url, 0);
+    opengl->preparedFromFFmpeg(playStatus,source);
 }
+

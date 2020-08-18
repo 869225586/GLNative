@@ -13,11 +13,16 @@
 #include "../filter/FilterYuv.h"
 #include "BaseRender.h"
 #include "../vbo/FilterVboYuv.h"
+
+#include "../ffmpeg/FFmpeg.h"
+
 class Opengl {
 public:
     EglThread *wlEglThread = NULL;
     ANativeWindow *nativeWindow = NULL;
-    BaseRender *baseOpengl = NULL;
+    BaseRender *baseRender = NULL;
+
+    FFmpeg *ffmpeg = NULL;
 
     int pic_width;
     int pic_height;
@@ -39,6 +44,8 @@ public:
     void setYuvData(void *y, void *u, void *v, int w, int h);
 
     void setPilex(void *data, int width, int height, int length);
+
+    void preparedFromFFmpeg(PlayStatus *playStatus, const char *url);
 };
 
 

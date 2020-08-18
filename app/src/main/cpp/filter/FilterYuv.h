@@ -53,4 +53,4 @@ public:
 };
 
 
-#endif //NATIVE_FILTERVBOYUV_H
+#endif NATIVE_FILTERVBOYUV_H

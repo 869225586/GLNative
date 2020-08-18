@@ -23,6 +23,7 @@ add_library( # Sets the name of the library.
         src/main/cpp/ffmpeg/AudioPlayer.cpp
         src/main/cpp/ffmpeg/StreamQueue.cpp
         src/main/cpp/ffmpeg/PlayStatus.cpp
+        src/main/cpp/ffmpeg/VideoPlayer.cpp
         )
 
 add_library(avcodec-57 STATIC IMPORTED)
