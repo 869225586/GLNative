@@ -13,13 +13,13 @@ VideoPlayer::VideoPlayer(PlayStatus *playStatus) {
 
 
 VideoPlayer::~VideoPlayer() {
-
+    pthread_mutex_destroy(&codecMutex);
 }
 
 //视频 解码
 void *playVideo(void *data) {
     VideoPlayer *videoPlayer = static_cast<VideoPlayer *>(data);
-    while (videoPlayer->playStatus != NULL&&!videoPlayer->playStatus->exit) {
+    while (videoPlayer->playStatus != NULL && !videoPlayer->playStatus->exit) {
         if (videoPlayer->playStatus->seek) {
             av_usleep(1000 * 100);
             continue;
@@ -75,6 +75,63 @@ void *playVideo(void *data) {
                                              videoPlayer->avCodecContext->height,
                                              videoPlayer->ctx);
                     }
+                } else {
+                    LOGE("当前视频不是YUV420P格式");
+                    //不是yuv 420 进行转 格式转换
+                    AVFrame *pFrameYUV420P = av_frame_alloc();
+                    int num = av_image_get_buffer_size(
+                            AV_PIX_FMT_YUV420P,
+                            videoPlayer->avCodecContext->width,
+                            videoPlayer->avCodecContext->height,
+                            1);
+                    uint8_t *buffer = static_cast<uint8_t *>(av_malloc(num * sizeof(uint8_t)));
+                    av_image_fill_arrays(
+                            pFrameYUV420P->data,
+                            pFrameYUV420P->linesize,
+                            buffer,
+                            AV_PIX_FMT_YUV420P,
+                            videoPlayer->avCodecContext->width,
+                            videoPlayer->avCodecContext->height,
+                            1);
+                    SwsContext *sws_ctx = sws_getContext(
+                            videoPlayer->avCodecContext->width,
+                            videoPlayer->avCodecContext->height,
+                            videoPlayer->avCodecContext->pix_fmt,
+                            videoPlayer->avCodecContext->width,
+                            videoPlayer->avCodecContext->height,
+                            AV_PIX_FMT_YUV420P,
+                            SWS_BICUBIC, NULL, NULL, NULL);
+
+                    if (!sws_ctx) {
+                        av_frame_free(&pFrameYUV420P);
+                        av_free(pFrameYUV420P);
+                        av_free(buffer);
+                        pthread_mutex_unlock(&videoPlayer->codecMutex);
+                        continue;
+                    }
+                    sws_scale(
+                            sws_ctx,
+                            reinterpret_cast<const uint8_t *const *>(avFrame->data),
+                            avFrame->linesize,
+                            0,
+                            avFrame->height,
+                            pFrameYUV420P->data,
+                            pFrameYUV420P->linesize);
+                    //渲染
+                    double diff = videoPlayer->getFrameDiffTime(avFrame, NULL);
+                    av_usleep(videoPlayer->getDelayTime(diff) * 1000000);
+                    if (videoPlayer->callYuv != NULL) {
+                        videoPlayer->callYuv(pFrameYUV420P->data[0],
+                                             pFrameYUV420P->data[1],
+                                             pFrameYUV420P->data[2],
+                                             pFrameYUV420P->linesize[0],
+                                             videoPlayer->avCodecContext->height,
+                                             videoPlayer->ctx);
+                    }
+                    av_frame_free(&pFrameYUV420P);
+                    av_free(pFrameYUV420P);
+                    av_free(buffer);
+                    sws_freeContext(sws_ctx);
                 }
                 videoPlayer->releaseAvpacket(avPacket);
                 videoPlayer->releaseAvFrame(avFrame);
@@ -105,7 +162,7 @@ double VideoPlayer::getFrameDiffTime(AVFrame *avFrame, AVPacket *avPacket) {
     //pts 是 当前帧 什么时候显示 。 time_base 是结构体 num  den 代表时间刻度
     //相乘？？？？
     pts *= av_q2d(time_base);
-    LOGD("当前帧 pts %lf,timebase num %d  timebase den  %d",pts,time_base.num,time_base.den);
+    LOGD("当前帧 pts %lf,timebase num %d  timebase den  %d", pts, time_base.num, time_base.den);
 
     if (pts > 0) {
         clock = pts;
@@ -146,18 +203,15 @@ double VideoPlayer::getDelayTime(double diff) {
 }
 
 void VideoPlayer::release() {
-    if(queue != NULL)
-    {
-        delete(queue);
+    if (queue != NULL) {
+        delete (queue);
         queue = NULL;
     }
-    if(abs_ctx != NULL)
-    {
+    if (abs_ctx != NULL) {
         av_bsf_free(&abs_ctx);
         abs_ctx = NULL;
     }
-    if(avCodecContext != NULL)
-    {
+    if (avCodecContext != NULL) {
         pthread_mutex_lock(&codecMutex);
         avcodec_close(avCodecContext);
         avcodec_free_context(&avCodecContext);
@@ -165,8 +219,7 @@ void VideoPlayer::release() {
         pthread_mutex_unlock(&codecMutex);
     }
 
-    if(playStatus != NULL)
-    {
+    if (playStatus != NULL) {
         playStatus = NULL;
     }
 

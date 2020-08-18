@@ -125,9 +125,11 @@ void FFmpeg::start() {
         return;
     }
     surpportMediaCodec = false;
-    videoPlayer->audioPlayer=audioPlayer;
+    videoPlayer->audioPlayer = audioPlayer;
     audioPlayer->play();
     videoPlayer->play();
+    const char* codecName = ((const AVCodec*)videoPlayer->avCodecContext->codec)->name;
+    LOGD("当前视频的格式 %s",codecName);
     while (playStatus != NULL && !playStatus->exit) {
         if (playStatus->seek) {
             av_usleep(1000 * 100);
@@ -210,8 +212,7 @@ void FFmpeg::seek(int64_t seconds) {
             avcodec_flush_buffers(audioPlayer->avCodecContext);
             pthread_mutex_unlock(&audioPlayer->codecMutex);
         }
-        if(videoPlayer != NULL)
-        {
+        if (videoPlayer != NULL) {
             videoPlayer->queue->clearQueue();
             videoPlayer->clock = 0;
             pthread_mutex_lock(&videoPlayer->codecMutex);
@@ -274,12 +275,11 @@ void FFmpeg::release() {
     }
 
     LOGE("释放 video");
-     if(videoPlayer != NULL)
-     {
-         videoPlayer->release();
-         delete(videoPlayer);
-         videoPlayer = NULL;
-     }
+    if (videoPlayer != NULL) {
+        videoPlayer->release();
+        delete (videoPlayer);
+        videoPlayer = NULL;
+    }
     LOGE("释放 封装格式上下文");
     if (pFormatCtx != NULL) {
         avformat_close_input(&pFormatCtx);

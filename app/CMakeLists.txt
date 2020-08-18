@@ -24,6 +24,7 @@ add_library( # Sets the name of the library.
         src/main/cpp/ffmpeg/StreamQueue.cpp
         src/main/cpp/ffmpeg/PlayStatus.cpp
         src/main/cpp/ffmpeg/VideoPlayer.cpp
+        src/main/cpp/calljava/CallJava.cpp
         )
 
 add_library(avcodec-57 STATIC IMPORTED)
