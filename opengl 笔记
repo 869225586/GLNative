@@ -26,4 +26,8 @@
     FFMpeg
     pts dts time_base  博客
     https://www.cnblogs.com/ZY-Dream/p/10245464.html
+    得出的结论为 pts 是告诉什么时间显示这帧 数据 但是pts 单位并不是多少秒。
+    我们视频会把自己分成很多刻度 类似于一个尺子 每一个视频帧都对应自己的刻度 。然而计算这一帧是第几秒
+    就需要time_base  time_base 是没个刻度多少秒。 比如一个视频是25 帧 那么 没帧就是1/25 秒
+    那么我们计算 某一帧 是第几秒 就需要pts *time_base;
 
