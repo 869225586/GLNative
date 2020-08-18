@@ -64,8 +64,8 @@ void *playVideo(void *data) {
                     continue;
                 }
                 if (avFrame->format == AV_PIX_FMT_YUV420P) {
-                    double diff = videoPlayer->getFrameDiffTime(avFrame,NULL);
-                    av_usleep(videoPlayer->getDelayTime(diff)*1000000);
+                    double diff = videoPlayer->getFrameDiffTime(avFrame, NULL);
+                    av_usleep(videoPlayer->getDelayTime(diff) * 1000000);
                     if (videoPlayer->callYuv != NULL) {
                         videoPlayer->callYuv(avFrame->data[0],
                                              avFrame->data[1],
@@ -93,24 +93,21 @@ void VideoPlayer::play() {
 
 double VideoPlayer::getFrameDiffTime(AVFrame *avFrame, AVPacket *avPacket) {
     double pts = 0;
-    if(avFrame != NULL)
-    {
+    if (avFrame != NULL) {
         pts = av_frame_get_best_effort_timestamp(avFrame);
     }
-    if(avPacket != NULL)
-    {
+    if (avPacket != NULL) {
         pts = avPacket->pts;
     }
-    if(pts == AV_NOPTS_VALUE)
-    {
+    if (pts == AV_NOPTS_VALUE) {
         pts = 0;
     }
     //pts 是 当前帧 什么时候显示 。 time_base 是结构体 num  den 代表时间刻度
     //相乘？？？？
     pts *= av_q2d(time_base);
+    LOGD("当前帧 pts %lf,timebase num %d  timebase den  %d",pts,time_base.num,time_base.den);
 
-    if(pts > 0)
-    {
+    if (pts > 0) {
         clock = pts;
     }
 
@@ -119,45 +116,30 @@ double VideoPlayer::getFrameDiffTime(AVFrame *avFrame, AVPacket *avPacket) {
 }
 
 double VideoPlayer::getDelayTime(double diff) {
-    if(diff > 0.003)
-    {
+    if (diff > 0.003) {
         delayTime = delayTime * 2 / 3;
-        if(delayTime < defaultDelayTime / 2)
-        {
+        if (delayTime < defaultDelayTime / 2) {
             delayTime = defaultDelayTime * 2 / 3;
-        }
-        else if(delayTime > defaultDelayTime * 2)
-        {
+        } else if (delayTime > defaultDelayTime * 2) {
             delayTime = defaultDelayTime * 2;
         }
-    }
-    else if(diff < - 0.003)
-    {
+    } else if (diff < -0.003) {
         delayTime = delayTime * 3 / 2;
-        if(delayTime < defaultDelayTime / 2)
-        {
+        if (delayTime < defaultDelayTime / 2) {
             delayTime = defaultDelayTime * 2 / 3;
-        }
-        else if(delayTime > defaultDelayTime * 2)
-        {
+        } else if (delayTime > defaultDelayTime * 2) {
             delayTime = defaultDelayTime * 2;
         }
-    }
-    else if(diff == 0.003)
-    {
+    } else if (diff == 0.003) {
 
     }
-    if(diff >= 0.5)
-    {
+    if (diff >= 0.5) {
         delayTime = 0;
-    }
-    else if(diff <= -0.5)
-    {
+    } else if (diff <= -0.5) {
         delayTime = defaultDelayTime * 2;
     }
 
-    if(fabs(diff) >= 10)
-    {
+    if (fabs(diff) >= 10) {
         delayTime = defaultDelayTime;
     }
     return delayTime;

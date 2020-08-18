@@ -22,3 +22,8 @@
 
     onsurfaceChange   传给 egl 线程和 render
 
+
+    FFMpeg
+    pts dts time_base  博客
+    https://www.cnblogs.com/ZY-Dream/p/10245464.html
+
