@@ -15,7 +15,7 @@
 #include "../vbo/FilterVboYuv.h"
 
 #include "../ffmpeg/FFmpeg.h"
-
+#include "../calljava/CallJava.h"
 class Opengl {
 public:
     EglThread *wlEglThread = NULL;
@@ -45,7 +45,7 @@ public:
 
     void setPilex(void *data, int width, int height, int length);
 
-    void preparedFromFFmpeg(PlayStatus *playStatus, const char *url);
+    void preparedFromFFmpeg(PlayStatus *playStatus,CallJava *callJava, const char *url);
 };
 
 

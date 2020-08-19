@@ -4,14 +4,14 @@
 
 #include "FFmpeg.h"
 
-FFmpeg::FFmpeg(PlayStatus *playStatus, const char *url) {
+FFmpeg::FFmpeg(PlayStatus *playStatus, CallJava *callJava, const char *url) {
     this->url = url;
     this->playStatus = playStatus;
+    this->callJava = callJava;
     exit = false;
-    videoPlayer = new VideoPlayer(playStatus);
+    videoPlayer = new VideoPlayer(playStatus,callJava);
     pthread_mutex_init(&init_mutex, NULL);
     pthread_mutex_init(&seek_mutex, NULL);
-
 }
 
 FFmpeg::~FFmpeg() {
@@ -126,10 +126,52 @@ void FFmpeg::start() {
     }
     surpportMediaCodec = false;
     videoPlayer->audioPlayer = audioPlayer;
+    const char *codecName = ((const AVCodec *) videoPlayer->avCodecContext->codec)->name;
+    if (surpportMediaCodec = callJava->onCallIsSupportVideo(codecName)) {
+        LOGE("当前设备支持硬解码当前视频");
+        if (strcasecmp(codecName, "h264") == 0) {
+            bsFilter = av_bsf_get_by_name("h264_mp4toannexb");
+        } else if (strcasecmp(codecName, "h265") == 0) {
+            bsFilter = av_bsf_get_by_name("hevc_mp4toannexb");
+        }
+        if (bsFilter == NULL) {
+            goto end;
+        }
+        if (av_bsf_alloc(bsFilter, &videoPlayer->abs_ctx) != 0) {
+            surpportMediaCodec = false;
+            goto end;
+        }
+        if (avcodec_parameters_copy(videoPlayer->abs_ctx->par_in, videoPlayer->codecpar) < 0) {
+            surpportMediaCodec = false;
+            av_bsf_free(&videoPlayer->abs_ctx);
+            videoPlayer->abs_ctx = NULL;
+            goto end;
+        }
+        if (av_bsf_init(videoPlayer->abs_ctx) != 0) {
+            surpportMediaCodec = false;
+            av_bsf_free(&videoPlayer->abs_ctx);
+            videoPlayer->abs_ctx = NULL;
+            goto end;
+        }
+        videoPlayer->abs_ctx->time_base_in = videoPlayer->time_base;
+    }
+    end:
+    if (surpportMediaCodec) {
+        videoPlayer->codecType = CODEC_MEDIACODEC;
+        videoPlayer->callJava->
+                onCallInitMediacodec(
+                codecName,
+                videoPlayer->avCodecContext->width,
+                videoPlayer->avCodecContext->height,
+                videoPlayer->avCodecContext->extradata_size,
+                videoPlayer->avCodecContext->extradata_size,
+                videoPlayer->avCodecContext->extradata,
+                videoPlayer->avCodecContext->extradata);
+    }
     audioPlayer->play();
     videoPlayer->play();
-    const char* codecName = ((const AVCodec*)videoPlayer->avCodecContext->codec)->name;
-    LOGD("当前视频的格式 %s",codecName);
+
+    LOGD("当前视频的格式 %s", codecName);
     while (playStatus != NULL && !playStatus->exit) {
         if (playStatus->seek) {
             av_usleep(1000 * 100);

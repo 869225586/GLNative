@@ -16,6 +16,21 @@
 class CallJava {
 public:
     _JavaVM *javaVm = NULL;
+    JNIEnv *jniEnv= NULL;
+    jobject jobj;
+
+    jmethodID jmid_supportvideo;
+    jmethodID jmid_initmediacodec;
+    jmethodID jmid_decodeavpacket;
+public:
+    CallJava(_JavaVM *javaVm,JNIEnv *env,jobject *jobject);
+    ~CallJava();
+
+    bool onCallIsSupportVideo(const char *ffcodecname);
+
+    void onCallInitMediacodec(const char *mime, int width, int height, int csd0_size, int csd1_size, uint8_t *csd_0, uint8_t *csd_1);
+
+    void onCallDecodeAVPacket(int datasize, uint8_t *data);
 
 };
 

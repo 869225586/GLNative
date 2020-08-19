@@ -5,8 +5,9 @@
 #include "VideoPlayer.h"
 #include "../opengl/Opengl.h"
 
-VideoPlayer::VideoPlayer(PlayStatus *playStatus) {
+VideoPlayer::VideoPlayer(PlayStatus *playStatus, CallJava *callJava) {
     this->playStatus = playStatus;
+    this->callJava = callJava;
     queue = new StreamQueue(playStatus);
     pthread_mutex_init(&codecMutex, NULL);
 }
@@ -48,6 +49,28 @@ void *playVideo(void *data) {
             }
             if (videoPlayer->codecType == CODEC_MEDIACODEC) {
                 //硬解 回调java层
+                if(av_bsf_send_packet(videoPlayer->abs_ctx, avPacket) != 0)
+                {
+                    av_packet_free(&avPacket);
+                    av_free(avPacket);
+                    avPacket = NULL;
+                    continue;
+                }
+                while(av_bsf_receive_packet(videoPlayer->abs_ctx, avPacket) == 0)
+                {
+                    LOGE("开始解码");
+
+                    double diff = videoPlayer->getFrameDiffTime(NULL, avPacket);
+                    LOGE("diff is %f", diff);
+
+                    av_usleep(videoPlayer->getDelayTime(diff) * 1000000);
+                    videoPlayer->callJava->onCallDecodeAVPacket(avPacket->size, avPacket->data);
+
+                    av_packet_free(&avPacket);
+                    av_free(avPacket);
+                    continue;
+                }
+                avPacket = NULL;
             } else if (videoPlayer->codecType == CODEC_YUV) {
                 //软解
                 pthread_mutex_lock(&videoPlayer->codecMutex);

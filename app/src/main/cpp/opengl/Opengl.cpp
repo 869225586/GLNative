@@ -107,9 +107,9 @@ void Opengl::onDestorySurface() {
         ANativeWindow_release(nativeWindow);
         nativeWindow = NULL;
     }
-    if(ffmpeg!=NULL){
+    if (ffmpeg != NULL) {
         ffmpeg->release();
-        ffmpeg=NULL;
+        ffmpeg = NULL;
     }
 }
 
@@ -154,8 +154,8 @@ void Opengl::setYuvData(void *y, void *u, void *v, int w, int h) {
     }
 }
 
-void Opengl::preparedFromFFmpeg(PlayStatus *playStatus, const char *url) {
-    ffmpeg = new FFmpeg(playStatus, url);
+void Opengl::preparedFromFFmpeg(PlayStatus *playStatus, CallJava *callJava, const char *url) {
+    ffmpeg = new FFmpeg(playStatus, callJava, url);
 }
 
 

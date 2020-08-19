@@ -8,6 +8,8 @@
 #include "StreamQueue.h"
 
 #include "AudioPlayer.h"
+
+#include "../calljava/CallJava.h"
 /**
  *  由于 ffmpeg 包含 videoplayer ， opengl 又包含 ffmpeg  ，所以 opengl 间接包含 videoplayer
     所以这里不能再包含opengl 存在互相包含问题。 需要定一个class 与opengl 同名 然后再cpp 中包含opengl头文件就可以调用opengl 的方法
@@ -32,6 +34,7 @@ public:
     AVCodecParameters *codecpar = NULL;
     StreamQueue *queue = NULL;
     PlayStatus *playStatus = NULL;
+    CallJava *callJava = NULL;
 
     AVRational time_base;
     pthread_t thread_play;
@@ -50,7 +53,7 @@ public:
     onCallYUV callYuv;
     void *ctx;
 public:
-    VideoPlayer(PlayStatus *playStatus);
+    VideoPlayer(PlayStatus *playStatus,CallJava *callJava);
 
     ~VideoPlayer();
 
