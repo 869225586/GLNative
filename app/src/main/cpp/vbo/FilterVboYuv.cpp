@@ -99,7 +99,7 @@ void FilFilterVboYuv::onDraw() {
     glBindBuffer(vboId, GL_ARRAY_BUFFER);//绑定vbo
 
     glEnableVertexAttribArray(vPosition);
-    //2 代表 每两个数字 作为一个点  8 代表每个点占用的字节数 一个float 4个字节    0 代表从0开始取 偏移量
+    //2 代表 每两个数字 作为一个点  8 代表每个点占用的字节数 一个float 4个字节 ，   0 代表从0开始取 偏移量
     glVertexAttribPointer(vPosition, 2, GL_FLOAT, false, 8, 0);
 
     glEnableVertexAttribArray(fPosition);
