@@ -1,4 +1,4 @@
-package com.kwai.video.uikit.anative
+package com.sunyeyu.video.uikit.anative
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

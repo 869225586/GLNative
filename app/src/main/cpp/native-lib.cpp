@@ -11,7 +11,7 @@ PlayStatus *playStatus = NULL;
 _JavaVM *javaVM = NULL;
 CallJava *callJava = NULL;
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_kwai_video_uikit_anative_MainActivity_stringFromJNI(
+Java_com_sunyeyu_video_uikit_anative_MainActivity_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
@@ -19,24 +19,24 @@ Java_com_kwai_video_uikit_anative_MainActivity_stringFromJNI(
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_kwai_video_uikit_opengl_NativeOpengl_surfaceCreate(JNIEnv *env, jobject thiz,
-
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_surfaceCreate(JNIEnv *env, jobject thiz,
                                                             jobject surface) {
-
-    // TODO
+    if (callJava == NULL) {
+        callJava = new CallJava(javaVM, env, &thiz);
+    }
     if (opengl == NULL) {
-        opengl = new Opengl();
+        opengl = new Opengl(callJava);
     }
     opengl->onCreateSurface(env, surface);
 
 }extern "C"
 JNIEXPORT void JNICALL
-Java_com_kwai_video_uikit_opengl_NativeOpengl_surfaceChange(JNIEnv *env, jobject thiz, jint i1,
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_surfaceChange(JNIEnv *env, jobject thiz, jint i1,
                                                             jint i2) {
     opengl->onChangeSurface(i1, i2);
 }extern "C"
 JNIEXPORT void JNICALL
-Java_com_kwai_video_uikit_opengl_NativeOpengl_imgData(JNIEnv *env, jobject thiz, jint width,
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_imgData(JNIEnv *env, jobject thiz, jint width,
                                                       jint height,
                                                       jint length, jbyteArray data_) {
     jbyte *data = env->GetByteArrayElements(data_, NULL);
@@ -46,20 +46,20 @@ Java_com_kwai_video_uikit_opengl_NativeOpengl_imgData(JNIEnv *env, jobject thiz,
     env->ReleaseByteArrayElements(data_, data, 0); //释放data 与data_
 }extern "C"
 JNIEXPORT void JNICALL
-Java_com_kwai_video_uikit_opengl_NativeOpengl_surfaceDestroy(JNIEnv *env, jobject thiz) {
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_surfaceDestroy(JNIEnv *env, jobject thiz) {
     opengl->onDestorySurface();
     delete opengl;
     opengl = NULL;
 
 }extern "C"
 JNIEXPORT void JNICALL
-Java_com_kwai_video_uikit_opengl_NativeOpengl_changeFilter(JNIEnv *env, jobject thiz) {
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_changeFilter(JNIEnv *env, jobject thiz) {
     // TODO: implement changeFilter()
     opengl->onChangeFilter();
 
 }extern "C"
 JNIEXPORT void JNICALL
-Java_com_kwai_video_uikit_opengl_NativeOpengl_setYuvData(JNIEnv *env, jobject thiz, jbyteArray y_,
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_setYuvData(JNIEnv *env, jobject thiz, jbyteArray y_,
                                                          jbyteArray u_, jbyteArray v_, jint w,
                                                          jint h) {
     jbyte *y = env->GetByteArrayElements(y_, NULL);
@@ -89,7 +89,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_kwai_video_uikit_opengl_NativeOpengl_playFromFFmpeg(JNIEnv *env, jobject thiz,
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_playFromFFmpeg(JNIEnv *env, jobject thiz,
                                                              jstring url) {
     if (playStatus == NULL) {
         playStatus = new PlayStatus();

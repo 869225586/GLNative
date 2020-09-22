@@ -156,6 +156,7 @@ void FFmpeg::start() {
         videoPlayer->abs_ctx->time_base_in = videoPlayer->time_base;
     }
     end:
+    surpportMediaCodec=false;
     if (surpportMediaCodec) {
         videoPlayer->codecType = CODEC_MEDIACODEC;
         videoPlayer->callJava->

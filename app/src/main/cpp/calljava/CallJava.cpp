@@ -19,6 +19,8 @@ CallJava::CallJava(_JavaVM *javaVm, JNIEnv *env, jobject *jobject) {
                                             "(Ljava/lang/String;)Z");
     jmid_initmediacodec = jniEnv->GetMethodID(jlz, "initMediaCodec", "(Ljava/lang/String;II[B[B)V");
     jmid_decodeavpacket = jniEnv->GetMethodID(jlz, "decodeAVPacket", "(I[B)V");
+    jmid_callCamera = jniEnv->GetMethodID(jlz, "initSurfaceTextture", "(I)V");
+    jmid_update = jniEnv->GetMethodID(jlz,"updateSurfaceTextture","()V");
 }
 
 bool CallJava::onCallIsSupportVideo(const char *ffcodecname) {
@@ -28,7 +30,7 @@ bool CallJava::onCallIsSupportVideo(const char *ffcodecname) {
         return support;
     }
     jstring type = jniEnv->NewStringUTF(ffcodecname);
-    LOGD("calljava7%p",jobj);
+
     support = jniEnv->CallBooleanMethod(jobj, jmid_supportvideo, type);
     LOGD("calljava8");
     jniEnv->DeleteLocalRef(type);
@@ -67,5 +69,22 @@ void CallJava::onCallDecodeAVPacket(int datasize, uint8_t *data_) {
     jniEnv->SetByteArrayRegion(data, 0, datasize, reinterpret_cast<const jbyte *>(data_));
     jniEnv->CallVoidMethod(jobj, jmid_decodeavpacket, datasize, data);
     jniEnv->DeleteLocalRef(data);
+    javaVm->DetachCurrentThread();
+}
+
+void CallJava::onCallCamera(int cameraTexture) {
+    JNIEnv *jniEnv;
+    if (javaVm->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
+    }
+    jniEnv->CallVoidMethod(jobj, jmid_callCamera, cameraTexture);
+    javaVm->DetachCurrentThread();
+
+}
+
+void CallJava::onUpdateTexture() {
+    JNIEnv *jniEnv;
+    if (javaVm->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
+    }
+    jniEnv->CallVoidMethod(jobj, jmid_update);
     javaVm->DetachCurrentThread();
 }

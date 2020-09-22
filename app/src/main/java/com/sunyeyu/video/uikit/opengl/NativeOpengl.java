@@ -1,4 +1,4 @@
-package com.kwai.video.uikit.opengl;
+package com.sunyeyu.video.uikit.opengl;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
@@ -9,9 +9,15 @@ import java.nio.ByteBuffer;
 
 public class NativeOpengl {
     Surface surface;
+    OnCameraTextureCall onCameraTextureCall;
 
     static {
         System.loadLibrary("native-lib");
+    }
+
+    public interface OnCameraTextureCall {
+        void callTextTure(int textureId);
+        void update();
     }
 
     private MediaFormat mediaFormat;
@@ -36,6 +42,23 @@ public class NativeOpengl {
     public native void setYuvData(byte[] y, byte[] u, byte[] v, int w, int h);
 
     public native void playFromFFmpeg(String url);
+
+    public void initSurfaceTextture(int cameraTextureId) {
+        if (onCameraTextureCall != null) {
+            onCameraTextureCall.callTextTure(cameraTextureId);
+        }
+    }
+    public void updateSurfaceTextture() {
+        if (onCameraTextureCall != null) {
+            onCameraTextureCall.update();
+        }
+    }
+
+
+    public void setTextTureCall(OnCameraTextureCall onCameraTextureCall) {
+        this.onCameraTextureCall = onCameraTextureCall;
+    }
+
 
     /**
      * 初始化MediaCodec
@@ -64,7 +87,7 @@ public class NativeOpengl {
     }
 
     public boolean onCallIsSupportMediaCodec(String ffcodecname) {
-        Log.i("syy"," 是否支持硬解");
+        Log.i("syy", " 是否支持硬解");
         return VideoSupportUitl.isSupportCodec(ffcodecname);
     }
 

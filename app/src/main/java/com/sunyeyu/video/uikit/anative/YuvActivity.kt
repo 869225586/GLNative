@@ -1,11 +1,10 @@
-package com.kwai.video.uikit.anative
+package com.sunyeyu.video.uikit.anative
 
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.kwai.video.uikit.opengl.NativeOpengl
-import com.kwai.video.uikit.opengl.WlSurfaceView
+import com.sunyeyu.video.uikit.opengl.NativeOpengl
+import com.sunyeyu.video.uikit.opengl.WlSurfaceView
 import java.io.File
 import java.io.FileInputStream
 

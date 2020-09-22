@@ -8,7 +8,7 @@
 #include "../log/AndroidLog.h"
 #include <cstring>
 #include <GLES2/gl2.h>
-
+#include "../calljava/CallJava.h"
 /**
  * 本基类 是进行opengl 的一些操作 创建纹理 设置 矩阵 绘制 等等
  * 1 构造方法进行oengl 的顶点坐标 初始化 子类进行相应shader 加载 赋值等
@@ -36,7 +36,7 @@ public:
 
 public:
     BaseRender();
-
+//    BaseRender(CallJava *callJava);
     ~BaseRender();
 
 //    virtual //虚函数 类似java 的抽象方法 由 子类实现

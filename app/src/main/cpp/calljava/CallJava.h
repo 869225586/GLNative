@@ -22,6 +22,8 @@ public:
     jmethodID jmid_supportvideo;
     jmethodID jmid_initmediacodec;
     jmethodID jmid_decodeavpacket;
+    jmethodID jmid_callCamera;
+    jmethodID jmid_update;
 public:
     CallJava(_JavaVM *javaVm,JNIEnv *env,jobject *jobject);
     ~CallJava();
@@ -32,6 +34,9 @@ public:
 
     void onCallDecodeAVPacket(int datasize, uint8_t *data);
 
+    void onCallCamera(int cameraTexture);
+
+    void onUpdateTexture();
 };
 
 

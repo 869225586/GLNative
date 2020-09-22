@@ -18,6 +18,7 @@ add_library( # Sets the name of the library.
         src/main/cpp/filter/WlFilterTwo.cpp
         src/main/cpp/filter/FilterYuv.cpp
         src/main/cpp/vbo/FilterVboYuv.cpp
+        src/main/cpp/vbo/CameraRender.cpp
         #ffmpeg
         src/main/cpp/ffmpeg/FFmpeg.cpp
         src/main/cpp/ffmpeg/AudioPlayer.cpp

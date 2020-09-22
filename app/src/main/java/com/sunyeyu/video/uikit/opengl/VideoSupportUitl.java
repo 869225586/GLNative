@@ -1,4 +1,4 @@
-package com.kwai.video.uikit.opengl;
+package com.sunyeyu.video.uikit.opengl;
 
 import android.media.MediaCodecList;
 

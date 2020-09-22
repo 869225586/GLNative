@@ -11,11 +11,10 @@
 #include "../filter/FilterOne.h"
 #include "../filter/WlFilterTwo.h"
 #include "../filter/FilterYuv.h"
-#include "BaseRender.h"
 #include "../vbo/FilterVboYuv.h"
+#include "../vbo/CameraRender.h"
 
 #include "../ffmpeg/FFmpeg.h"
-#include "../calljava/CallJava.h"
 class Opengl {
 public:
     EglThread *wlEglThread = NULL;
@@ -29,7 +28,7 @@ public:
     void *pilex = NULL;
 
 public:
-    Opengl();
+    Opengl(CallJava *callJava);
 
     ~Opengl();
 

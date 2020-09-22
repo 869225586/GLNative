@@ -1,4 +1,4 @@
-package com.kwai.video.uikit.opengl;
+package com.sunyeyu.video.uikit.opengl;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -10,7 +10,7 @@ public class WlSurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private NativeOpengl nativeOpengl;
 
     private OnSurfaceListener onSurfaceListener;
-
+    NativeOpengl.OnCameraTextureCall onCameraTextureCall;
     public void setOnSurfaceListener(OnSurfaceListener onSurfaceListener) {
         this.onSurfaceListener = onSurfaceListener;
     }
@@ -55,7 +55,6 @@ public class WlSurfaceView extends SurfaceView implements SurfaceHolder.Callback
             nativeOpengl.surfaceDestroy();
         }
     }
-
     public interface OnSurfaceListener
     {
         void init();

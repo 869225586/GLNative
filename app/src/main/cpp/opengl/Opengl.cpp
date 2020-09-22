@@ -3,6 +3,7 @@
 //
 
 #include "Opengl.h"
+#include "../vbo/CameraRender.h"
 
 void callback_yuv(void *y, void *u, void *v, int width, int height, void *ctx) {
     Opengl *opengl = static_cast<Opengl *>(ctx);
@@ -131,10 +132,6 @@ void Opengl::setPilex(void *data, int width, int height, int length) {
 
 }
 
-Opengl::Opengl() {
-    baseRender = new FilFilterVboYuv();
-}
-
 Opengl::~Opengl() {
 
 }
@@ -156,6 +153,11 @@ void Opengl::setYuvData(void *y, void *u, void *v, int w, int h) {
 
 void Opengl::preparedFromFFmpeg(PlayStatus *playStatus, CallJava *callJava, const char *url) {
     ffmpeg = new FFmpeg(playStatus, callJava, url);
+}
+
+Opengl::Opengl(CallJava *callJava) {
+    baseRender = new FilFilterVboYuv();
+//    baseRender = new CameraRender(callJava);
 }
 
 

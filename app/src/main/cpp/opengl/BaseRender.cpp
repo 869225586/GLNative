@@ -57,3 +57,5 @@ void BaseRender::destroyData() {
 void BaseRender::setYuvData(void *y, void *u, void *v, int width, int height) {
 
 }
+
+
