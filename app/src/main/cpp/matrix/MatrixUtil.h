@@ -25,14 +25,54 @@ static void initMatrix(float *matrix) {
         }
     }
 }
-
-static void rotateMatrix(double angle, float *matrix) {
+/**
+ * z 轴旋转
+ * @param angle
+ * @param matrix
+ */
+static void rotateMatrixZ(double angle, float *matrix) {
     angle = angle * (M_PI / 180.0);
 
     matrix[0] = cos(angle);
     matrix[1] = -sin(angle);
     matrix[4] = sin(angle);
     matrix[5] = cos(angle);
+}
+
+/**
+ * x 轴旋转
+ *
+ * 1  0    0     0
+ * 0  cosQ -sinQ 0
+ * 0  sinQ cosQ  0
+ * 0  0    0     1
+ * @param angle
+ * @param matrix
+ */
+static void rotateMatrixX(double angle, float *matrix) {
+    angle = angle * (M_PI / 180.0);
+
+    matrix[5] = cos(angle);
+    matrix[6] = -sin(angle);
+    matrix[9] = sin(angle);
+    matrix[10] = cos(angle);
+}
+/**
+ * Y 轴旋转
+ * cosQ  0   sinQ     0
+ * 0     1   0        0
+ * -sinQ 0   cosQ     0
+ * 0     0   0        1
+ * @param angle
+ * @param matrix
+ */
+static void rotateMatrixY(double angle, float *matrix) {
+    angle = angle * (M_PI / 180.0);
+
+    matrix[0] = cos(angle);
+    matrix[2] = sin(angle);
+    matrix[8] = -sin(angle);
+    matrix[10] = cos(angle);
 }
 
 static void scaleMatrix(double scale, float *matrix) {

@@ -33,11 +33,12 @@ void CameraRender::onCreate() {
              "    gl_Position = v_Position * u_Matrix;\n"
              "}";
 
-    fragment = "precision mediump float;\n"
+    fragment = "#extension GL_OES_EGL_image_external : require\n"
+               "precision mediump float;\n"
                "varying vec2 ft_Position;\n"
-               "uniform sampler2D sTexture;\n"
+               "uniform samplerExternalOES sTexture;\n"
                "void main() {\n"
-               "    gl_FragColor=texture2D(sTexture, ft_Position);\n"
+               "  gl_FragColor=texture2D(sTexture, ft_Position);\n"
                "}";
 
     program = createProgrm(vertex, fragment, &vShader, &fShader);
@@ -121,33 +122,6 @@ void CameraRender::onDraw() {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindBuffer(0,GL_ARRAY_BUFFER);
-   /* if (yuv_wdith > 0 && yuv_height > 0) {
-        if (y != NULL) {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, textures[0]);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, yuv_wdith, yuv_height, 0, GL_LUMINANCE,
-                         GL_UNSIGNED_BYTE, y);
-            glUniform1i(sampler_y, 0);
-        }
-        if (u != NULL) {
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, textures[1]);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, yuv_wdith / 2, yuv_height / 2, 0,
-                         GL_LUMINANCE, GL_UNSIGNED_BYTE, u);
-            glUniform1i(sampler_u, 1);
-        }
-
-        if (v != NULL) {
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, textures[2]);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, yuv_wdith / 2, yuv_height / 2, 0,
-                         GL_LUMINANCE, GL_UNSIGNED_BYTE, v);
-            glUniform1i(sampler_v, 2);
-        }
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }*/
-
 
 }
 
@@ -168,18 +142,9 @@ void CameraRender::destroyData() {
 
 void CameraRender::setMatrix(int width, int height) {
     initMatrix(matrix);
-    if (yuv_wdith > 0 && yuv_height > 0) {
-        float screen_r = 1.0 * width / height;
-        float picture_r = 1.0 * yuv_wdith / yuv_height;
-        if (screen_r > picture_r) //图片宽度缩放
-        {
-            float r = width / (1.0 * height / yuv_height * yuv_wdith);
-            orthoM(-r, r, -1, 1, matrix);
-        } else {//图片高度缩放
-            float r = height / (1.0 * width / yuv_wdith * yuv_height);
-            orthoM(-1, 1, -r, r, matrix);
-        }
-    }
+    //相机 旋转 怎么算的瞎蒙的
+    rotateMatrixZ(-90, matrix);
+    rotateMatrixX(90,matrix);
 }
 
 void CameraRender::setYuvData(void *y, void *u, void *v, int width, int height) {
