@@ -66,7 +66,7 @@ task addReleaseVersionTag {
     doLast {
         "git add ${rootDir}/app/build.gradle".execute()
         "git commit -m '测试gradle'".execute()
-//        "git tag -a ${libVersion} -m ''".execute()
+        "git tag -a v2.23.4 -m ''".execute()
         "git push origin ${remoteBranch}".execute()
     }
 }
