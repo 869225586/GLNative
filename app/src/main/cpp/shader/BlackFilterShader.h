@@ -1,0 +1,8 @@
+//
+// Created by edz on 2020/9/25.
+//
+
+#ifndef NATIVE_BLACKFILTERSHADER_H
+#define NATIVE_BLACKFILTERSHADER_H
+
+#endif //NATIVE_BLACKFILTERSHADER_H

@@ -58,7 +58,18 @@ android {
     }*/
 
 }
-
+def remoteBranch = "master"
+/**
+ * git推送 task
+ */
+task addReleaseVersionTag {
+    doLast {
+        "git add ${rootDir}/app/build.gradle".execute()
+        "git commit -m '测试gradle'".execute()
+//        "git tag -a ${libVersion} -m ''".execute()
+        "git push origin ${remoteBranch}".execute()
+    }
+}
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
