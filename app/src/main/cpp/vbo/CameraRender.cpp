@@ -13,7 +13,7 @@
 /**
  * 启用vbo 的 filter
  */
-CameraRender::CameraRender(CallJava *callJava):BaseRender(){
+CameraRender::CameraRender(CallJava *callJava) : BaseRender() {
     this->callJava = callJava;
 }
 
@@ -58,8 +58,10 @@ void CameraRender::onCreate() {
     glBufferSubData(GL_ARRAY_BUFFER, 0, vertexSize, vertexs);
     glBufferSubData(GL_ARRAY_BUFFER, vertexSize, fragmentSize, fragments);
 
-    glBindBuffer(0, GL_ARRAY_BUFFER);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    glGenBuffers(1, &fboId); //生成一个fboid
+    glBindFramebuffer(GL_FRAMEBUFFER, fboId); //绑定fbo
 
     glGenTextures(1, &texture);
 
@@ -68,8 +70,8 @@ void CameraRender::onCreate() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,720,1280,0,
-                 GL_RGBA,GL_UNSIGNED_BYTE,NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 720, 1280, 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
 
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -83,7 +85,7 @@ void CameraRender::onCreate() {
     glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    callJava->onCallCamera(cameraId);
+    callJava->onCallCamera(cameraId);//打开相机
 
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
 
@@ -105,7 +107,7 @@ void CameraRender::onDraw() {
 
     glUniformMatrix4fv(u_matrix, 1, GL_FALSE, matrix);
 
-    glBindBuffer(vboId, GL_ARRAY_BUFFER);//绑定vbo
+    glBindBuffer(GL_ARRAY_BUFFER, vboId);//绑定vbo
     glActiveTexture(GL_TEXTURE5);//激活纹理
     glUniform1i(sampler, 5); //使用纹理
     glBindTexture(GL_TEXTURE_2D, texture);//绑定纹理
@@ -121,7 +123,8 @@ void CameraRender::onDraw() {
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindTexture(GL_TEXTURE_2D, 0);
-    glBindBuffer(0,GL_ARRAY_BUFFER);
+//    glBindBuffer(0,GL_ARRAY_BUFFER);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 }
 
@@ -144,7 +147,7 @@ void CameraRender::setMatrix(int width, int height) {
     initMatrix(matrix);
     //相机 旋转 怎么算的瞎蒙的
     rotateMatrixZ(-90, matrix);
-    rotateMatrixX(90,matrix);
+    rotateMatrixX(90, matrix);
 }
 
 void CameraRender::setYuvData(void *y, void *u, void *v, int width, int height) {

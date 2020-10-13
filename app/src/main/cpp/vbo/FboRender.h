@@ -6,8 +6,27 @@
 #define NATIVE_FBORENDER_H
 
 
-class FboRender {
+#include "../opengl/BaseRender.h"
 
+class FboRender : BaseRender {
+private:
+    GLuint vPosition;
+    GLuint fPosition;
+    GLuint texture;
+public:
+    FboRender();
+
+    ~FboRender();
+
+    void onCreate();
+
+    void onChange(int w, int h);
+
+    void onDraw();
+
+    void destroyGl(); //销毁gl相关 需在egl 线程进行 否则销毁无效
+
+    void destroyData();//销毁 数据 像素点 等可不必在 egl 线程中做销毁
 };
 
 

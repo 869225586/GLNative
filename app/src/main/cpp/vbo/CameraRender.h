@@ -18,7 +18,9 @@ public:
     GLint sampler;
     GLuint texture;//上面三个纹理的数组
     GLuint vboId; //vbo id
+    GLuint fboId;
 
+    //fbo id
     GLuint cameraId;//创建一个camera 的纹理id
 
     float matrix[16];
@@ -27,7 +29,6 @@ public:
 
     CallJava *callJava;
 public:
-//    CameraRender();
     CameraRender(CallJava *callJava);
 
     ~CameraRender();
