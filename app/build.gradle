@@ -62,13 +62,31 @@ def remoteBranch = "master"
 /**
  * git推送 task
  */
+/**
+ * git推送 task
+ */
 task addReleaseVersionTag {
     doLast {
-        "git add ${rootDir}/app/build.gradle".execute()
-        "git commit -m '测试gradle'".execute()
-//        "git tag -a v2.23.4 -m ''".execute()
-        "git push origin ${remoteBranch}:${remoteBranch}".execute()
+        "git checkout -b release/RB_v2.1.1 origin/master".execute()
+        "git tag -a r/2.1.1 -m ''".execute()
+        "git push origin r/2.1.1".execute()
     }
+}
+task pushNewTag{
+    def statusP="git status".execute()
+    println("status:\n"+statusP.inputStream.text)
+    statusP.waitFor()
+    def addP="git add app/build.gradle".execute()
+    println("git add:\n"+addP.inputStream.text)
+    addP.waitFor()
+    def commitP="git commit -m '测试'".execute()
+    println("git commit:\n"+commitP.inputStream.text)
+    commitP.waitFor()
+    def pushP="git push origin release/RB_v2.1.1:release/RB_v2.1.1".execute()
+    println("git push:\n"+pushP.inputStream.text)
+    pushP.waitFor()
+//        "git tag -a ${tag} -m ''".execute()
+//        "git push origin ${remoteBranch}".execute()
 }
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
