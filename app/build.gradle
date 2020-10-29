@@ -64,10 +64,13 @@ def remoteBranch = "master"
  */
 task addReleaseVersionTag {
     doLast {
+//        "git checkout -b release/RB_v2.1.1 origin/master".execute()
         "git add ${rootDir}/app/build.gradle".execute()
-        "git commit -m '测试gradle'".execute()
-//        "git tag -a v2.23.4 -m ''".execute()
-        "git push origin ${remoteBranch}:${remoteBranch}".execute()
+        "git commit -m 'v2.1.1.0'".execute()
+        "git push origin release/RB_v2.1.1".execute()
+
+        "git tag -a v/2.1.1.0 -m ''".execute()
+        "git push origin v/2.1.1.0".execute()
     }
 }
 dependencies {
