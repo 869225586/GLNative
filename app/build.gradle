@@ -67,7 +67,7 @@ def remoteBranch = "master"
  */
 task addReleaseVersionTag {
     doLast {
-        "git checkout -b release/RB_v2.1.1 origin/master".execute()
+        "git checkout -b release/RB_v2.1.2 origin/master".execute()
         "git tag -a r/2.1.1 -m ''".execute()
         "git push origin r/2.1.1".execute()
     }
