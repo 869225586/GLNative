@@ -58,7 +58,7 @@ android {
     }*/
 
 }
-def remoteBranch = "master"
+def remoteBranch = "release"
 def tag = "v2.1.1"
 /**
  * git推送 task
