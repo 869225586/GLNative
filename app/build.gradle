@@ -85,8 +85,12 @@ task pushNewTag{
     def pushP="git push origin release/RB_v2.1.1:release/RB_v2.1.1".execute()
     println("git push:\n"+pushP.inputStream.text)
     pushP.waitFor()
-//        "git tag -a ${tag} -m ''".execute()
-//        "git push origin ${remoteBranch}".execute()
+    def tagP="git tag -a v2.3.1 -m ''".execute()
+    println("git tag:\n"+tagP.inputStream.text)
+    tagP.waitFor()
+    def pushTagP="git push origin release/RB_v2.1.1 v2.3.1".execute()
+    println("git push tag:\n"+pushTagP.inputStream.text)
+    pushTagP.waitFor()
 }
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
