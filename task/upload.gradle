@@ -1,0 +1,112 @@
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+//def定义的变量才会在project中
+def POM_NAME = 'allinone'
+
+def POM_VERSION = '1.0.0'
+
+def POM_ARTIFACTID = "allinone"//项目名称id
+
+def POM_GROUPID = 'com.kwai.video'  //项目组id
+
+def POM_PACKAGING = 'aar'
+
+def POM_DESCRIPTION = 'lib for Android'
+
+def NEXUS_USERNAME = 'admin'   //用户名
+
+def NEXUS_PASSWORD = 'admin123'  //密码
+
+def NEXUS_REPOSITORY_URL = 'http://localhost:8081/repository/ttsx/'  //repository的URL
+def NEXUS_LOCAL_URL = uri("${rootProject.projectDir}/local-maven")
+
+/*task androidJavadocs(type: Javadoc) {
+    options.encoding = "utf-8"
+    source = android.sourceSets.main.java.srcDirs
+    //添加classpath，解析类型
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+//打包doc
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+    classifier = 'javadoc' //分类器，区分jar
+    from androidJavadocs.destinationDir
+}*/
+
+//打包源码
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'//分类器，区分jar
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives androidSourcesJar
+}
+task uploadToMaven(dependsOn:["assembleDebug","publish"])
+/**
+ * 上传到maven库 生成pom 文件
+ */
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: NEXUS_LOCAL_URL)
+            pom.project {
+                name POM_NAME
+                version POM_VERSION
+                artifactId POM_ARTIFACTID
+                groupId POM_GROUPID
+                packaging POM_PACKAGING
+                description POM_DESCRIPTION
+            }
+        }
+    }
+}
+
+//发布aar到本地仓库
+publishing {
+    //指定maven 仓库地址和用户名密码
+    repositories {
+        maven {
+            credentials {
+                username NEXUS_USERNAME
+                password NEXUS_PASSWORD
+            }
+            url NEXUS_REPOSITORY_URL //maven库地址
+        }
+    }
+    publications {
+        audio(MavenPublication) {
+            // 使用方引用 implementation 'cn.com.jack:mavendemo:2.7.0-SNAPSHOT'
+            groupId = POM_GROUPID
+            artifactId =POM_ARTIFACTID
+            version = POM_VERSION
+            // 依赖 bundleReleaseAar 任务，并上传其产出的aar
+//            afterEvaluate { artifact(tasks.getByName("assembleDebug")) }
+            // 也可以指定上传的AAR包，但是需要先手动生成aar
+             artifact("${this.buildDir}/outputs/aar/com_kwai_video_allinone_v1.0.0.aar")
+            // 上传source，这样使用放可以看到方法注释
+//            artifact androidSourcesJar
+            // pom文件中声明依赖，从而传递到使用方
+/*            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+                configurations.implementation.allDependencies.each {
+                    // 避免出现空节点或 artifactId=unspecified 的节点
+                    if (it.group != null && (it.name != null && "unspecified" != it.name) && it.version != null) {
+                        println it.toString()
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+                        dependencyNode.appendNode('scope', 'implementation')
+                        if(xxx){
+                            final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                            exclusionNode.appendNode('groupId', '*')
+                            exclusionNode.appendNode('artifactId', '*')
+                        }
+                    }
+                }
+            }*/
+        }
+    }
+}

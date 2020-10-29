@@ -1,0 +1,120 @@
+def tag = "r" + ALLINONE_VERSION //tag 版本号
+def remoteBranch = "release/RB_v" + ALLINONE_VERSION.substring(0,ALLINONE_VERSION.length()-2) //远端分支名
+/**
+ * 获取 版本号
+ * @return
+ */
+String getPomVersion() {
+    if (ALLINONE_TYPE.toInteger() == 0) {
+        return "${ALLINONE_VERSION}-yy"
+    } else if (ALLINONE_TYPE.toInteger() == 1) {
+        return "${ALLINONE_VERSION}-shortvideo-yy"
+    } else if (ALLINONE_TYPE.toInteger() == 2) {
+        return outputFileName = "${ALLINONE_VERSION}-live-yy"
+    }
+}
+/**
+ * 检查版本号 true从master 拉分支 false从 release 拉分支
+ */
+boolean checkVersion(String remoteBranch){
+    def versions=ALLINONE_VERSION.toString().split(".");
+    if(versions.length!=4){
+        //版本号出错
+        throw new Exception("build failed : the sdk version code is error")
+    }
+    //判断是否需要
+    if(versions[versions.length-1].toInteger()== 0 ){
+        //末尾是0 新版本 需要 拉分支 打tag
+        return true
+    }else{
+        //判断版本号是否是增加的
+        def p = "git branch -a".execute()
+        def remoteBranchs
+        p.text.eachLine {
+            if (it.contains("release/")) {
+                remoteBranch=it.indexOf("release/")
+                int index=it.lastIndexOf("v")
+                remoteBranchs = it.substring(index+1).split(".")
+            }
+        }
+        if(versions[0]>=remoteBranchs[0]&&versions[1]>=remoteBranchs[1]
+                &&versions[2]>=remoteBranchs[2]){
+
+            return false
+        }else{
+            throw new Exception("build failed : the sdk version code is error")
+        }
+
+    }
+}
+task checkoutBranch{
+    checkVersion(remoteBranch)
+    doLast{
+    // 新拉分支 打 tag
+    "git checkout -b release/RB_v2.1.1 origin/master".execute()
+    "git tag -a r/2.1.1 -m ''".execute()
+    "git push origin r/2.1.1".execute()
+    }
+}
+def addReleaseVersionTag(){
+    doLast {
+        "git checkout -b release/RB_v2.1.1 origin/master".execute()
+        "git tag -a r/2.1.1 -m ''".execute()
+        "git push origin r/2.1.1".execute()
+    }
+}
+task  pushNewTag(){
+    def statusP="git status".execute()
+    println("git status:\n"+statusP.inputStream.text)
+    statusP.waitFor()
+    def addP="git add version/version.gradle".execute()
+    println("git add:\n"+addP.inputStream.text)
+    addP.waitFor()
+    def addP2="git add app/dependence.gradle".execute()
+    println("git add:\n"+addP2.inputStream.text)
+    addP2.waitFor()
+    def commitP="git commit -m 'sdk version'".execute()
+    println("git commit:\n"+commitP.inputStream.text)
+    commitP.waitFor()
+    def pushP="git push origin release/RB_v2.1.1:release/RB_v2.1.1".execute()
+    println("git push:\n"+pushP.inputStream.text)
+    pushP.waitFor()
+    def tagP="git tag -a ${tag} -m ''".execute()
+    println("git tag:\n"+tagP.inputStream.text)
+    tagP.waitFor()
+    def pushTagP="git push origin ${remoteBranch} ${tag}".execute()
+    println("git push tag:\n"+pushTagP.inputStream.text)
+    pushTagP.waitFor()
+}
+
+/**
+ * git推送 task
+ */
+task addReleaseVersionTag {
+    if (!IS_RELEASE.toBoolean()) {
+        //如果不是release 版本不推送git
+        return
+    }
+    println("-----" + POM_VERSION)
+    def p = "git branch  -a".execute()
+    def currentBranch
+    def currentCode
+    p.text.eachLine {
+        if (it.contains("release/")) {
+            currentBranch = it.substring(1)
+            currentCode = currentBranch.charAt(currentBranch.length() - 1)
+            println(currentBranch + "--" + currentCode)
+        }
+    }
+    doLast {
+        "git add ${rootDir}/version/version.txt".execute()
+        "git add ${rootDir}/app/dependence.gradle".execute()
+        "git commit -m ''".execute()
+        "git tag -a ${tag} -m ''".execute()
+        "git push origin ${remoteBranch}".execute()
+    }
+}
+
+task startGit(dependsOn){
+
+}

@@ -1,0 +1,215 @@
+apply form 'git.gradle'
+
+//声明 所有依赖项集合
+configurations.embed.transitive = false
+def dependenceList = []
+//version 版本信息集合
+def versionList = []
+def moudles = this.rootProject.getAllprojects()
+def POM_VERSION = getPomVersion()
+def POM_ARTIFACTID = "allinone"//项目名称id
+def POM_GROUPID = 'com.kwai.video'  //项目组id
+
+
+/**
+ * 修改 build.gradle
+ */
+task changeDependenceBuild {
+    def destDir = new File(this.rootDir, 'app/dependence.gradle')
+    doLast {
+        destDir.withWriter { writer ->
+            writer.write("dependencies {\n")
+            writer.write("     implementation '" + POM_GROUPID + ":" + POM_ARTIFACTID + "-" + POM_VERSION + "@aar'\n")
+            writer.write("}")
+        }
+    }
+}
+
+/**
+ * 处理 所有依赖放到集合里
+ */
+task loadDependence {
+    //基础sdk
+    dependenceList << FFMPEG
+    versionList << "ffmpeng: " + FFMPEG + "\n"
+
+    dependenceList << AUDIOPROCESS
+    versionList << "audioProcess: " + AUDIOPROCESS + "\n"
+
+    dependenceList << KSTURBOJPEGLIB
+    versionList << "ksturbojpeglib: " + KSTURBOJPEGLIB + "\n"
+
+    dependenceList << LIBYUV
+    versionList << "libyuv: " + LIBYUV + "\n"
+
+    dependenceList << KSCPPPROTOBUF
+    versionList << "kscppprotobuf: " + KSCPPPROTOBUF + "\n"
+
+    //拍摄 sdk
+    dependenceList << DAENERYS
+    versionList << "daenerys: " + DAENERYS + "\n"
+
+    dependenceList << WESTEROS
+    versionList << "westeros: " + WESTEROS + "\n"
+
+    dependenceList << KSCAMERAKIT
+    versionList << "kscamerakit: " + KSCAMERAKIT + "\n"
+
+    //播放 sdk
+    dependenceList << AEGON
+    versionList << "aegon: " + AEGON + "\n"
+
+    dependenceList << HODOR
+    versionList << "hodor: " + HODOR + "\n"
+
+    dependenceList << HODOR_DEBUG_TOOLS
+    versionList << "hodor_debug_tools: " + HODOR_DEBUG_TOOLS + "\n"
+
+    dependenceList << KWAIPLAYER
+    versionList << "kwaiplayer: " + KWAIPLAYER + "\n"
+
+    dependenceList << KWAIPLAYER_DEBUG_TOOLS
+    versionList << "kwaiplayer_debug_tools: " + KWAIPLAYER_DEBUG_TOOLS + "\n"
+
+    dependenceList << KSVODPLAYERKIT
+    versionList << "ksvodplayerkit: " + KSVODPLAYERKIT + "\n"
+
+    if (ALLINONE_TYPE.toInteger() == 0 || ALLINONE_TYPE.toInteger() == 1) {
+        //短视频包或者全量包
+        //基础sdk
+        dependenceList << LIBUV
+        versionList << "libuv: " + LIBUV + "\n"
+
+        //编辑 sdk
+        dependenceList << KSVIDEORENDER
+        versionList << "ksvideorender: " + KSVIDEORENDER + "\n"
+        dependenceList << KSVISIONEGINE
+        versionList << "ksvisionegine: " + KSVISIONEGINE + "\n"
+        dependenceList << KSCAPEKIT
+        versionList << "kscapekit: " + KSCAPEKIT + "\n"
+        dependenceList << KSCLIPKIT
+        versionList << "ksclipkit: " + KSCLIPKIT + "\n"
+
+        //上传 sdk
+        dependenceList << RICKON
+        versionList << "rickon: " + RICKON + "\n"
+        dependenceList << KSUPLOADERKIT
+        versionList << "ksuploaderkit: " + KSUPLOADERKIT + "\n"
+    }
+
+    if (ALLINONE_TYPE.toInteger() == 2 || ALLINONE_TYPE.toInteger() == 0) {
+        //直播包 或者全量包
+        //直播 sdk
+        dependenceList << ARYA
+        versionList << "arya: " + ARYA + "\n"
+        dependenceList << STANNIS
+        versionList << "stannis: " + STANNIS + "\n"
+        dependenceList << RTCKIT
+        versionList << "rtckit: " + RTCKIT + "\n"
+        dependenceList << KSLIVEPLAYER
+        versionList << "ksliveplayer: " + KSLIVEPLAYER + "\n"
+        dependenceList << KSMEDIALIVEKIT
+        versionList << "ksmedialivekit: " + KSMEDIALIVEKIT + "\n"
+    }
+    println("配置依赖项完毕")
+}
+
+//保存version 文件
+task saveVersionFile {
+    if (!IS_RELEASE.toBoolean()) {
+        //如果不是release 版本不保存 版本信息
+        return
+    }
+    def destDir = new File(this.rootDir, 'version')
+    destDir.mkdir()
+    def name = "ALLINONE_SDK_VERISON :" + ALLINONE_VERSION + "\n"
+    def versionInfo = "SDK版本信息 : \n"
+    def destFile = new File(destDir, "version.txt")
+    destFile.withWriter { writer ->
+        writer.write("${name}${versionInfo}")
+        versionList.each {
+            if (it?.trim()) {
+                writer.write("${it}")
+            }
+        }
+    }
+    println("version文件保存完毕")
+}
+
+/**
+ * 添加依赖
+ */
+task addDependence(dependsOn: [loadDependence, saveVersionFile]) {
+    moudles.each {
+        if ("allinonelibrary" == it.name) {
+            Project project = it.project
+            dependenceList.each {
+                /*  String[] str = it.replace("@aar", "").split(":")
+                  def sdkName = str[str.length - 2]*/
+                if (it?.trim()) {
+                    println("SDK 添加依赖" + it)
+                    project.dependencies.add("embed", it)
+                }
+            }
+        }
+    }
+}
+
+/**
+ * jenkins 任务
+ */
+task startAllInOne{
+
+}
+
+
+def delete(List list) {
+    list.each {
+        String[] str = it.replace("@aar", "").split(":")
+        def sdkName = str[str.length - 2]
+        def sdkShortVersion = str[str.length - 1]
+        def sdkGroup = str[0]
+        println("去重 " + sdkName);
+        def debugSoV7a = file("build/intermediates/exploded-aar/" + sdkGroup + "/" + sdkName + "/" + sdkShortVersion + "/debug/jni/armeabi-v7a/libc++_shared.so")
+        def debugSoV8a = file("build/intermediates/exploded-aar/" + sdkGroup + "/" + sdkName + "/" + sdkShortVersion + "/debug/jni/arm64-v8a/libc++_shared.so")
+        def releaseSoV7a = file("build/intermediates/exploded-aar/" + sdkGroup + "/" + sdkName + "/" + sdkShortVersion + "/release/jni/armeabi-v7a/libc++_shared.so")
+        def releaseSoV8a = file("build/intermediates/exploded-aar/" + sdkGroup + "/" + sdkName + "/" + sdkShortVersion + "/release/jni/arm64-v8a/libc++_shared.so")
+
+        //目前保留daenerys 里面的shared.so
+        if (sdkName == "daenerys") return
+        if (debugSoV7a.exists()) {
+            boolean result = delete(debugSoV7a)
+            println(sdkName + "v7a debug去重 ${result}")
+        }
+        if (debugSoV8a.exists()) {
+            boolean result = delete(debugSoV8a)
+            println(sdkName + "v8a debug去重 ${result}")
+        }
+        if (releaseSoV7a.exists()) {
+            boolean result = delete(releaseSoV7a)
+            println(sdkName + "v7a release去重 ${result}")
+        }
+        if (releaseSoV8a.exists()) {
+            boolean result = delete(releaseSoV8a)
+            println(sdkName + "v8a release去重 ${result}")
+        }
+    }
+}
+
+task deleteDuplicateResources() {
+    doLast {
+        delete(dependenceList)
+    }
+}
+//针对某一个 过程进行相应的 去重
+afterEvaluate {
+    tasks.matching {
+        it.name == 'mergeDebugJniLibFolders' || it.name == 'mergeReleaseJniLibFolders'
+    }.each { task ->
+        println '++++++++++++  ' + task.name + '  +++++++++++++++'
+        task.dependsOn 'deleteDuplicateResources'
+        task.mustRunAfter 'deleteDuplicateResources'
+    }
+
+}
+

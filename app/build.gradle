@@ -59,15 +59,37 @@ android {
 
 }
 def remoteBranch = "master"
+def tag = "v2.1.1"
 /**
  * git推送 task
  */
 task addReleaseVersionTag {
     doLast {
-        "git add ${rootDir}/app/build.gradle".execute()
-        "git commit -m '测试gradle'".execute()
-//        "git tag -a v2.23.4 -m ''".execute()
-        "git push origin ${remoteBranch}:${remoteBranch}".execute()
+        "git checkout -b ${remoteBranch} origin/master".execute()
+        "git tag -a r/2.1.1 -m ''".execute()
+        "git push origin r/2.1.1".execute()
+    }
+}
+task pushNewTag{
+    doLast{
+        def statusP="git status".execute()
+        println("status:\n"+statusP.inputStream.text)
+        statusP.waitFor()
+        def addP="git add app/build.gradle".execute()
+        println("git add:\n"+addP.inputStream.text)
+        addP.waitFor()
+        def commitP="git commit -m '测试2'".execute()
+        println("git commit:\n"+commitP.inputStream.text)
+        commitP.waitFor()
+        def pushP="git push origin ${remoteBranch}:${remoteBranch}".execute()
+        println("git push:\n"+pushP.inputStream.text)
+        pushP.waitFor()
+        def tagP="git tag -a ${tag} -m ''".execute()
+        println("git tag:\n"+tagP.inputStream.text)
+        tagP.waitFor()
+        def pushTagP="git push origin ${remoteBranch} ${tag}".execute()
+        println("git push tag:\n"+pushTagP.inputStream.text)
+        pushTagP.waitFor()
     }
 }
 dependencies {
