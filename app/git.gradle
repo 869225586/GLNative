@@ -57,18 +57,15 @@ def checkoutLocalBranch(String remoteBranchName, String errorMsg) {
  * 推送 version.txt 和 dependence.gradle 到git
  * @return
  */
-def pushVersionAndGradlToGit() {
+def pushVersionAndGradlToGit(String remoteBranch) {
     def statusP = "git status".execute()
     println("git status:\n" + statusP.inputStream.text)
     statusP.waitFor()
 
-    def addP = "git add version/version.gradle".execute()
+    def addP = "git add app/git.gradle".execute()
     println("git add:\n" + addP.inputStream.text)
-    addP.waitFor()
+    addP.waitFor(5000)
 
-    def addP2 = "git add app/dependence.gradle".execute()
-    println("git add:\n" + addP2.inputStream.text)
-    addP2.waitFor()
 
     def commitP = "git commit -m 'sdk version'".execute()
     println("git commit:\n" + commitP.inputStream.text)
@@ -78,11 +75,11 @@ def pushVersionAndGradlToGit() {
     println("git push:\n" + pushP.inputStream.text)
     pushP.waitFor()
 
-    def tagP = "git tag -a ${tag} -m ''".execute()
+    def tagP = "git tag -a v2.1.6 -m ''".execute()
     println("git tag:\n" + tagP.inputStream.text)
     tagP.waitFor()
 
-    def pushTagP = "git push origin ${remoteBranch} ${tag}".execute()
+    def pushTagP = "git push origin ${remoteBranch} v2.1.6".execute()
     println("git push tag:\n" + pushTagP.inputStream.text)
     pushTagP.waitFor()
 }
@@ -91,7 +88,20 @@ def pushVersionAndGradlToGit() {
  */
 task startGit {
     doLast {
-        checkoutLocalBranch(remoteBranch,errorMsg)
+//        checkoutLocalBranch(remoteBranch,errorMsg)
+//        pushVersionAndGradlToGit(remoteBranch)
+        def statusP = "git status".execute()
+        println("git status:\n" + statusP.inputStream.text)
+        statusP.waitFor()
+
+        def addP = "git add app/git.gradle".execute()
+        println("git add:\n" + addP.inputStream.text)
+        addP.waitFor()
+
+
+        def commitP = "git commit -m '测试sss'".execute()
+        println("git commit:\n" + commitP.inputStream.text)
+        commitP.waitFor()
     }
 }
 
