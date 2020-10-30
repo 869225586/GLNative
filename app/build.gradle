@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-
+apply from : 'git.gradle'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -58,41 +58,7 @@ android {
     }*/
 
 }
-def remoteBranch = "release"
-def tag = "v2.1.1"
-/**
- * git推送 task
- */
-task addReleaseVersionTag {
-    doLast {
-        print(remoteBranch)
-        "git checkout -b ${remoteBranch} origin/master".execute()
-        "git tag -a r/2.1.1 -m ''".execute()
-        "git push origin r/2.1.1".execute()
-    }
-}
-task pushNewTag{
-    doLast{
-        def statusP="git status".execute()
-        println("status:\n"+statusP.inputStream.text)
-        statusP.waitFor()
-        def addP="git add app/build.gradle".execute()
-        println("git add:\n"+addP.inputStream.text)
-        addP.waitFor()
-        def commitP="git commit -m '测试2'".execute()
-        println("git commit:\n"+commitP.inputStream.text)
-        commitP.waitFor()
-        def pushP="git push origin ${remoteBranch}:${remoteBranch}".execute()
-        println("git push:\n"+pushP.inputStream.text)
-        pushP.waitFor()
-        def tagP="git tag -a ${tag} -m ''".execute()
-        println("git tag:\n"+tagP.inputStream.text)
-        tagP.waitFor()
-        def pushTagP="git push origin ${remoteBranch} ${tag}".execute()
-        println("git push tag:\n"+pushTagP.inputStream.text)
-        pushTagP.waitFor()
-    }
-}
+
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

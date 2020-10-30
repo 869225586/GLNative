@@ -1,4 +1,4 @@
-def remoteBranch = "release/RB_" + ALLINONE_VERSION.toString().substring(0, ALLINONE_VERSION.length()) //远端分支名
+def remoteBranch = "release/RB_2.1.1" //远端分支名
 def errorMsg = "build failed : the sdk version code is error"
 /**
  * 检查版本号 true从master 拉分支 false从 release 拉分支
@@ -39,7 +39,7 @@ boolean checkVersion(String errorMsg) {
 
 def checkoutLocalBranch(String remoteBranchName, String errorMsg) {
     // 从某个远端分支 拉本地分支  并且打 tag
-    if (checkVersion(errorMsg)) {
+    if (true) {
         println("checkout branch from master")
         "git checkout -b release/RB_v2.1.1 origin/master".execute()
 //        //从主分支拉 要打 Tag
@@ -90,10 +90,6 @@ def pushVersionAndGradlToGit() {
  * git推送 task
  */
 task startGit {
-    if (!IS_RELEASE.toBoolean()) {
-        //如果不是release 版本不推送git
-        return
-    }
     doLast {
         checkoutLocalBranch(remoteBranch,errorMsg)
     }
