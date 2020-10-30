@@ -64,10 +64,10 @@ def pushVersionAndGradlToGit(String remoteBranch) {
 
     def addP = "git add app/git.gradle".execute()
     println("git add:\n" + addP.inputStream.text)
-    addP.waitFor(5000)
+    addP.waitFor()
 
 
-    def commitP = "git commit -m 'sdk version'".execute()
+    def commitP = "git commit -m '版本测试'".execute()
     println("git commit:\n" + commitP.inputStream.text)
     commitP.waitFor()
 
@@ -75,11 +75,11 @@ def pushVersionAndGradlToGit(String remoteBranch) {
     println("git push:\n" + pushP.inputStream.text)
     pushP.waitFor()
 
-    def tagP = "git tag -a v2.1.6 -m ''".execute()
+    def tagP = "git tag -a v2.1.7 -m ''".execute()
     println("git tag:\n" + tagP.inputStream.text)
     tagP.waitFor()
 
-    def pushTagP = "git push origin ${remoteBranch} v2.1.6".execute()
+    def pushTagP = "git push origin ${remoteBranch} v2.1.7".execute()
     println("git push tag:\n" + pushTagP.inputStream.text)
     pushTagP.waitFor()
 }
@@ -89,19 +89,7 @@ def pushVersionAndGradlToGit(String remoteBranch) {
 task startGit {
     doLast {
 //        checkoutLocalBranch(remoteBranch,errorMsg)
-//        pushVersionAndGradlToGit(remoteBranch)
-        def statusP = "git status".execute()
-        println("git status:\n" + statusP.inputStream.text)
-        statusP.waitFor()
-
-        def addP = "git add app/git.gradle".execute()
-        println("git add:\n" + addP.inputStream.text)
-        addP.waitFor()
-
-
-        def commitP = "git commit -m '2.1.1版本'".execute()
-        println("git commit:\n" + commitP.inputStream.text)
-        commitP.waitFor()
+        pushVersionAndGradlToGit(remoteBranch)
     }
 }
 
