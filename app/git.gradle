@@ -43,8 +43,8 @@ def checkoutLocalBranch(String remoteBranchName, String errorMsg) {
         println("checkout branch from master")
         "git checkout -b release/RB_v2.1.1 origin/master".execute()
 //        //从主分支拉 要打 Tag
-        "git tag -a ${tag} -m ''".execute()
-        "git push origin ${tag}".execute()
+        "git tag -a r/2.1.1 -m ''".execute()
+        "git push origin r/2.1.1".execute()
     } else {
         //从release 分支拉
         println("checkout branch from release")
