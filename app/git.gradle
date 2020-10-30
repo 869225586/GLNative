@@ -1,10 +1,10 @@
-def remoteBranch = "release/RB_2.1.1" //远端分支名
+def remoteBranch = "release/RB_v2.1.1" //远端分支名
 def errorMsg = "build failed : the sdk version code is error"
 /**
  * 检查版本号 true从master 拉分支 false从 release 拉分支
  */
 boolean checkVersion(String errorMsg) {
-    def versions = ALLINONE_VERSION.toString().split("\\.")
+    def versions ="v2.1.1.3".split("\\.")
     if (versions.size() != 4) {
         //版本号出错
         throw new Exception(errorMsg)
@@ -15,22 +15,23 @@ boolean checkVersion(String errorMsg) {
         return true
     } else {
         //判断前三位版本号是否一致
-        def p = "git branch -a".execute()
-        def remoteBranchs = []
-        p.text.eachLine {
-            if (it.contains("release/RB")) {
-                int index = it.lastIndexOf("_")
-                remoteBranchs = it.substring(index + 1).split("\\.")
-            }
+        def tagP = "git tag".execute()
+        def tagArray=tagP.inputStream.text.split("\n")
+        def lastTagCode = tagArray[tagArray.size()-1].substring(1).split("\\.")
+        lastTagCode.each {
+            println(it)
         }
-        if (remoteBranchs.size() >= 3) {
-            if (versions[0] == remoteBranchs[0] && versions[1] == remoteBranchs[1]
-                    && versions[2] == remoteBranchs[2]) {
+
+        if (lastTagCode.size() == 4) {
+            if (versions[0] == lastTagCode[0] && versions[1] == lastTagCode[1]
+                    && versions[2] == lastTagCode[2]&&versions[3]>lastTagCode[3]) {
 
                 return false
             } else {
                 throw new Exception(errorMsg)
             }
+        }else{
+            throw new Exception("No Valid Tag ")
         }
 
 
@@ -52,7 +53,21 @@ def checkoutLocalBranch(String remoteBranchName, String errorMsg) {
     }
 
 }
+boolean   getLocalBranchName(String branch){
+    def p = "git branch ".execute()
+    def result= false
+    def localBranch = p.inputStream.text.split("\n")
+    localBranch.each {
+        if(it.contains("*")){
+            println(it.substring(1))
+        }
+        if(it.trim() == branch){
+            result = true
+        }
+    }
+    return result
 
+}
 /**
  * 推送 version.txt 和 dependence.gradle 到git
  * @return
@@ -86,12 +101,19 @@ def pushVersionAndGradlToGit() {
     println("git push tag:\n" + pushTagP.inputStream.text)
     pushTagP.waitFor()
 }
+def test(){
+    localBranch = "444"
+}
 /**
  * git推送 task
  */
 task startGit {
     doLast {
-        checkoutLocalBranch(remoteBranch,errorMsg)
+//        checkoutLocalBranch(remoteBranch,errorMsg)
+//        checkVersion(errorMsg)
+
+        println(getLocalBranchName(remoteBranch)
+        )
     }
 }
 

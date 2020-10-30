@@ -1,5 +1,6 @@
 def remoteBranch = "release/RB_" + ALLINONE_VERSION.toString().substring(0, ALLINONE_VERSION.length()) //远端分支名
 def errorMsg = "build failed : the sdk version code is error"
+def commitMsg = "打包版本提交"
 /**
  * 检查版本号 true从master 拉分支 false从 release 拉分支
  */
@@ -36,19 +37,28 @@ boolean checkVersion(String errorMsg) {
 
     }
 }
-
+/**
+ * 从远端拉分支
+ * @param remoteBranchName
+ * @param errorMsg
+ * @return
+ */
 def checkoutLocalBranch(String remoteBranchName, String errorMsg) {
+    def tag
     // 从某个远端分支 拉本地分支  并且打 tag
     if (checkVersion(errorMsg)) {
+        tag = "r" + ALLINONE_VERSION.toString().substring(
+                0, ALLINONE_VERSION.toString().length() - 2
+        )
         println("checkout branch from master")
-        "git checkout -b release/RB_v2.1.1 origin/master".execute()
+        "git checkout -b ${remoteBranchName} origin/master".execute()
 //        //从主分支拉 要打 Tag
         "git tag -a ${tag} -m ''".execute()
         "git push origin ${tag}".execute()
     } else {
         //从release 分支拉
         println("checkout branch from release")
-        "git checkout -b release/RB_v2.1.1 origin/${remoteBranchName}".execute()
+        "git checkout -b ${remoteBranchName} origin/${remoteBranchName}".execute()
     }
 
 }
@@ -57,7 +67,8 @@ def checkoutLocalBranch(String remoteBranchName, String errorMsg) {
  * 推送 version.txt 和 dependence.gradle 到git
  * @return
  */
-def pushVersionAndGradlToGit() {
+def pushVersionAndGradlToGit(String remoteBranch,String commitMsg) {
+    def tag = "v" + ALLINONE_VERSION.toString()
     def statusP = "git status".execute()
     println("git status:\n" + statusP.inputStream.text)
     statusP.waitFor()
@@ -70,11 +81,11 @@ def pushVersionAndGradlToGit() {
     println("git add:\n" + addP2.inputStream.text)
     addP2.waitFor()
 
-    def commitP = "git commit -m 'sdk version'".execute()
+    def commitP = "git commit -m '${commitMsg}'".execute()
     println("git commit:\n" + commitP.inputStream.text)
     commitP.waitFor()
 
-    def pushP = "git push origin release/RB_v2.1.1:release/RB_v2.1.1".execute()
+    def pushP = "git push origin ${remoteBranch}:${remoteBranch}".execute()
     println("git push:\n" + pushP.inputStream.text)
     pushP.waitFor()
 
@@ -95,7 +106,8 @@ task startGit {
         return
     }
     doLast {
-        checkoutLocalBranch(remoteBranch,errorMsg)
+        //先拉分支 打tag
+        checkoutLocalBranch(remoteBranch, errorMsg)
     }
 }
 
