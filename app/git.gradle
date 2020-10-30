@@ -1,4 +1,4 @@
-def remoteBranch = "release/RB_2.1.1" //远端分支名
+def remoteBranch = "release/RB_v2.1.1" //远端分支名
 def errorMsg = "build failed : the sdk version code is error"
 /**
  * 检查版本号 true从master 拉分支 false从 release 拉分支
@@ -70,15 +70,15 @@ def pushVersionAndGradlToGit(String remoteBranch) {
     println("git commit:\n" + commitP.inputStream.text)
     commitP.waitFor()
 
-    def pushP = "git push origin release/RB_v2.1.1:release/RB_v2.1.1".execute()
+    def pushP = "git push origin ${remoteBranch}:${remoteBranch}".execute()
     println("git push:\n" + pushP.inputStream.text)
     pushP.waitFor()
 
-    def tagP = "git tag -a v2.1.9 -m '版本提交'".execute()
+    def tagP = "git tag -a v2.1.11 -m '版本提交'".execute()
     println("git tag:\n" + tagP.inputStream.text)
     tagP.waitFor()
 
-    def pushTagP = "git push origin ${remoteBranch} v2.1.9".execute()
+    def pushTagP = "git push origin ${remoteBranch} v2.1.11".execute()
 
     println("git push tag:\n" + pushTagP.inputStream.text)
     pushTagP.waitFor()
