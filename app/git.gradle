@@ -75,11 +75,11 @@ def pushVersionAndGradlToGit(String remoteBranch) {
     println("git push:\n" + pushP.inputStream.text)
     pushP.waitFor()
 
-    def tagP = "git tag -a v2.1.7 -m ''".execute()
+    def tagP = "git tag -a v2.1.8 -m '版本提交'".execute()
     println("git tag:\n" + tagP.inputStream.text)
     tagP.waitFor()
 
-    def pushTagP = "git push origin ${remoteBranch} v2.1.7".execute()
+    def pushTagP = "git push origin ${remoteBranch} v2.1.8".execute()
     println("git push tag:\n" + pushTagP.inputStream.text)
     pushTagP.waitFor()
 }
