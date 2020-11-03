@@ -112,8 +112,10 @@ task startGit {
 //        checkoutLocalBranch(remoteBranch,errorMsg)
 //        checkVersion(errorMsg)
 
-        println(getLocalBranchName(remoteBranch)
-        )
+        println(getLocalBranchName(remoteBranch))
+
+        def str="33"
+        str?println("234"):println("444")
     }
 }
 

@@ -34,7 +34,24 @@ boolean checkVersion(String errorMsg) {
             }
         }
 
-
+//        def tagP = "git tag".execute()
+//        def tagArray=tagP.inputStream.text.split("\n")
+//        def lastTagCode = tagArray[tagArray.size()-1].substring(1).split("\\.")
+//        lastTagCode.each {
+//            println(it)
+//        }
+//
+//        if (lastTagCode.size() == 4) {
+//            if (versions[0] == lastTagCode[0] && versions[1] == lastTagCode[1]
+//                    && versions[2] == lastTagCode[2]&&versions[3]>lastTagCode[3]) {
+//
+//                return false
+//            } else {
+//                throw new Exception(errorMsg)
+//            }
+//        }else{
+//            throw new Exception("No Valid Tag ")
+//        }
     }
 }
 /**

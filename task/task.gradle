@@ -1,4 +1,4 @@
-apply form 'git.gradle'
+apply from: 'git.gradle'
 
 //声明 所有依赖项集合
 configurations.embed.transitive = false
@@ -9,8 +9,21 @@ def moudles = this.rootProject.getAllprojects()
 def POM_VERSION = getPomVersion()
 def POM_ARTIFACTID = "allinone"//项目名称id
 def POM_GROUPID = 'com.kwai.video'  //项目组id
+def env = {System.getenv it}
 
-
+/**
+ * 获取 版本号
+ * @return
+ */
+String getPomVersion() {
+    if (SDK_TYPE.toString() == SDK_TYPE_ALL.toString()) {
+        return "${VERSION}-yy"
+    } else if (SDK_TYPE.toString() == SDK_TYPE_SHORT.toString()) {
+        return "${VERSION}-shortvideo-yy"
+    } else if (SDK_TYPE.toString() == SDK_TYPE_LIVE.toString()) {
+        return outputFileName = "${VERSION}-live-yy"
+    }
+}
 /**
  * 修改 build.gradle
  */
@@ -30,99 +43,99 @@ task changeDependenceBuild {
  */
 task loadDependence {
     //基础sdk
-    dependenceList << FFMPEG
-    versionList << "ffmpeng: " + FFMPEG + "\n"
+    dependenceList << FFMPEG_VERSION
+    versionList << "ffmpeng: " + FFMPEG_VERSION + "\n"
 
-    dependenceList << AUDIOPROCESS
-    versionList << "audioProcess: " + AUDIOPROCESS + "\n"
+    dependenceList << AUDIOPROCESS_VERSION
+    versionList << "audioProcess: " + AUDIOPROCESS_VERSION + "\n"
 
-    dependenceList << KSTURBOJPEGLIB
-    versionList << "ksturbojpeglib: " + KSTURBOJPEGLIB + "\n"
+    dependenceList << KSTURBOJPEGLIB_VERSION
+    versionList << "ksturbojpeglib: " + KSTURBOJPEGLIB_VERSION + "\n"
 
-    dependenceList << LIBYUV
-    versionList << "libyuv: " + LIBYUV + "\n"
+    dependenceList << LIBYUV_VERSION
+    versionList << "libyuv: " + LIBYUV_VERSION + "\n"
 
-    dependenceList << KSCPPPROTOBUF
-    versionList << "kscppprotobuf: " + KSCPPPROTOBUF + "\n"
+    dependenceList << KSCPPPROTOBUF_VERSION
+    versionList << "kscppprotobuf: " + KSCPPPROTOBUF_VERSION + "\n"
 
     //拍摄 sdk
-    dependenceList << DAENERYS
-    versionList << "daenerys: " + DAENERYS + "\n"
+    dependenceList << DAENERYS_VERSION
+    versionList << "daenerys: " + DAENERYS_VERSION + "\n"
 
-    dependenceList << WESTEROS
-    versionList << "westeros: " + WESTEROS + "\n"
+    dependenceList << WESTEROS_VERSION
+    versionList << "westeros: " + WESTEROS_VERSION + "\n"
 
-    dependenceList << KSCAMERAKIT
-    versionList << "kscamerakit: " + KSCAMERAKIT + "\n"
+    dependenceList << KSCAMERAKIT_VERSION
+    versionList << "kscamerakit: " + KSCAMERAKIT_VERSION + "\n"
 
     //播放 sdk
-    dependenceList << AEGON
-    versionList << "aegon: " + AEGON + "\n"
+    dependenceList << AEGON_VERSION
+    versionList << "aegon: " + AEGON_VERSION + "\n"
 
-    dependenceList << HODOR
-    versionList << "hodor: " + HODOR + "\n"
+    dependenceList << HODOR_VERSION
+    versionList << "hodor: " + HODOR_VERSION + "\n"
 
-    dependenceList << HODOR_DEBUG_TOOLS
-    versionList << "hodor_debug_tools: " + HODOR_DEBUG_TOOLS + "\n"
+    dependenceList << HODOR_DEBUG_TOOLS_VERSION
+    versionList << "hodor_debug_tools: " + HODOR_DEBUG_TOOLS_VERSION + "\n"
 
-    dependenceList << KWAIPLAYER
-    versionList << "kwaiplayer: " + KWAIPLAYER + "\n"
+    dependenceList << KWAIPLAYER_VERSION
+    versionList << "kwaiplayer: " + KWAIPLAYER_VERSION + "\n"
 
-    dependenceList << KWAIPLAYER_DEBUG_TOOLS
-    versionList << "kwaiplayer_debug_tools: " + KWAIPLAYER_DEBUG_TOOLS + "\n"
+    dependenceList << KWAIPLAYER_DEBUG_TOOLS_VERSION
+    versionList << "kwaiplayer_debug_tools: " + KWAIPLAYER_DEBUG_TOOLS_VERSION + "\n"
 
-    dependenceList << KSVODPLAYERKIT
-    versionList << "ksvodplayerkit: " + KSVODPLAYERKIT + "\n"
+    dependenceList << KSVODPLAYERKIT_VERSION
+    versionList << "ksvodplayerkit: " + KSVODPLAYERKIT_VERSION + "\n"
 
-    if (ALLINONE_TYPE.toInteger() == 0 || ALLINONE_TYPE.toInteger() == 1) {
+    if (SDK_TYPE.toString() == SDK_TYPE_ALL.toString() || SDK_TYPE.toString() == SDK_TYPE_SHORT.toString()) {
         //短视频包或者全量包
         //基础sdk
-        dependenceList << LIBUV
-        versionList << "libuv: " + LIBUV + "\n"
+        dependenceList << LIBUV_VERSION
+        versionList << "libuv: " + LIBUV_VERSION + "\n"
 
         //编辑 sdk
-        dependenceList << KSVIDEORENDER
-        versionList << "ksvideorender: " + KSVIDEORENDER + "\n"
-        dependenceList << KSVISIONEGINE
-        versionList << "ksvisionegine: " + KSVISIONEGINE + "\n"
-        dependenceList << KSCAPEKIT
-        versionList << "kscapekit: " + KSCAPEKIT + "\n"
-        dependenceList << KSCLIPKIT
-        versionList << "ksclipkit: " + KSCLIPKIT + "\n"
+        dependenceList << KSVIDEORENDER_VERSION
+        versionList << "ksvideorender: " + KSVIDEORENDER_VERSION + "\n"
+        dependenceList << KSVISIONEGINE_VERSION
+        versionList << "ksvisionegine: " + KSVISIONEGINE_VERSION + "\n"
+        dependenceList << KSCAPEKIT_VERSION
+        versionList << "kscapekit: " + KSCAPEKIT_VERSION + "\n"
+        dependenceList << KSCLIPKIT_VERSION
+        versionList << "ksclipkit: " + KSCLIPKIT_VERSION + "\n"
 
         //上传 sdk
-        dependenceList << RICKON
-        versionList << "rickon: " + RICKON + "\n"
-        dependenceList << KSUPLOADERKIT
-        versionList << "ksuploaderkit: " + KSUPLOADERKIT + "\n"
+        dependenceList << RICKON_VERSION
+        versionList << "rickon: " + RICKON_VERSION + "\n"
+        dependenceList << KSUPLOADERKIT_VERSION
+        versionList << "ksuploaderkit: " + KSUPLOADERKIT_VERSION + "\n"
     }
 
-    if (ALLINONE_TYPE.toInteger() == 2 || ALLINONE_TYPE.toInteger() == 0) {
+    if (SDK_TYPE.toString() == SDK_TYPE_LIVE.toString() || SDK_TYPE.toString() == SDK_TYPE_ALL.toString()) {
         //直播包 或者全量包
         //直播 sdk
-        dependenceList << ARYA
-        versionList << "arya: " + ARYA + "\n"
-        dependenceList << STANNIS
-        versionList << "stannis: " + STANNIS + "\n"
-        dependenceList << RTCKIT
-        versionList << "rtckit: " + RTCKIT + "\n"
-        dependenceList << KSLIVEPLAYER
-        versionList << "ksliveplayer: " + KSLIVEPLAYER + "\n"
-        dependenceList << KSMEDIALIVEKIT
-        versionList << "ksmedialivekit: " + KSMEDIALIVEKIT + "\n"
+        dependenceList << ARYA_VERSION
+        versionList << "arya: " + ARYA_VERSION + "\n"
+        dependenceList << STANNIS_VERSION
+        versionList << "stannis: " + STANNIS_VERSION + "\n"
+        dependenceList << RTCKIT_VERSION
+        versionList << "rtckit: " + RTCKIT_VERSION + "\n"
+        dependenceList << KSLIVEPLAYER_VERSION
+        versionList << "ksliveplayer: " + KSLIVEPLAYER_VERSION + "\n"
+        dependenceList << KSMEDIALIVEKIT_VERSION
+        versionList << "ksmedialivekit: " + KSMEDIALIVEKIT_VERSION + "\n"
     }
     println("配置依赖项完毕")
 }
 
 //保存version 文件
 task saveVersionFile {
-    if (!IS_RELEASE.toBoolean()) {
+    if (IS_TEST.toBoolean()) {
         //如果不是release 版本不保存 版本信息
         return
     }
     def destDir = new File(this.rootDir, 'version')
     destDir.mkdir()
-    def name = "ALLINONE_SDK_VERISON :" + ALLINONE_VERSION + "\n"
+    def name = "ALLINONE_SDK_VERISON :" + VERSION + "\n"
     def versionInfo = "SDK版本信息 : \n"
     def destFile = new File(destDir, "version.txt")
     destFile.withWriter { writer ->
@@ -153,13 +166,6 @@ task addDependence(dependsOn: [loadDependence, saveVersionFile]) {
             }
         }
     }
-}
-
-/**
- * jenkins 任务
- */
-task startAllInOne{
-
 }
 
 
