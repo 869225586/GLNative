@@ -1,57 +1,42 @@
-def remoteBranch = "release/RB_" + ALLINONE_VERSION.toString().substring(0, ALLINONE_VERSION.length()) //远端分支名
+def sdk_version = env(VERSION)
+def remoteBranch = "release/RB_" + sdk_version.substring(0, sdk_version.length() - 2) //远端分支名
 def errorMsg = "build failed : the sdk version code is error"
 def commitMsg = "打包版本提交"
+
 /**
  * 检查版本号 true从master 拉分支 false从 release 拉分支
  */
-boolean checkVersion(String errorMsg) {
-    def versions = ALLINONE_VERSION.toString().split("\\.")
-    if (versions.size() != 4) {
-        //版本号出错
-        throw new Exception(errorMsg)
-    }
+boolean checkBranch(String version, String errorMsg) {
+    def versions = version.split("\\.")
     //判断是否需要
     if (versions[versions.size() - 1].toInteger() == 0) {
         //末尾是0 新版本 需要 拉分支 打tag
         return true
     } else {
-        //判断前三位版本号是否一致
-        def p = "git branch -a".execute()
-        def remoteBranchs = []
-        p.text.eachLine {
-            if (it.contains("release/RB")) {
-                int index = it.lastIndexOf("_")
-                remoteBranchs = it.substring(index + 1).split("\\.")
+        def tagP = "git tag".execute()
+        def tagArray = tagP.inputStream.text.split("\n")
+        def lastIndex = -1
+        for (int i = 0; i < tagArray.size(); i++) {
+            if (tagArray[i].contains(version.substring(0,version.length()-2))) {
+                lastIndex = i
             }
         }
-        if (remoteBranchs.size() >= 3) {
-            if (versions[0] == remoteBranchs[0] && versions[1] == remoteBranchs[1]
-                    && versions[2] == remoteBranchs[2]) {
-
-                return false
+        if (lastIndex == -1) {
+            throw new Exception(errorMsg)
+        } else {
+            println("find tag ${tagArray[lastIndex]}")
+            def lastTagCode = tagArray[lastIndex].substring(1).split("\\.")
+            if (lastTagCode.size() == 4) {
+                if (versions[0] == lastTagCode[0] && versions[1] == lastTagCode[1]
+                        && versions[2] == lastTagCode[2] && versions[3] > lastTagCode[3]) {
+                    return false
+                } else {
+                    throw new Exception(errorMsg)
+                }
             } else {
-                throw new Exception(errorMsg)
+                throw new Exception("No Valid Tag ")
             }
         }
-
-//        def tagP = "git tag".execute()
-//        def tagArray=tagP.inputStream.text.split("\n")
-//        def lastTagCode = tagArray[tagArray.size()-1].substring(1).split("\\.")
-//        lastTagCode.each {
-//            println(it)
-//        }
-//
-//        if (lastTagCode.size() == 4) {
-//            if (versions[0] == lastTagCode[0] && versions[1] == lastTagCode[1]
-//                    && versions[2] == lastTagCode[2]&&versions[3]>lastTagCode[3]) {
-//
-//                return false
-//            } else {
-//                throw new Exception(errorMsg)
-//            }
-//        }else{
-//            throw new Exception("No Valid Tag ")
-//        }
     }
 }
 /**
@@ -62,66 +47,109 @@ boolean checkVersion(String errorMsg) {
  */
 def checkoutLocalBranch(String remoteBranchName, String errorMsg) {
     def tag
-    // 从某个远端分支 拉本地分支  并且打 tag
-    if (checkVersion(errorMsg)) {
-        tag = "r" + ALLINONE_VERSION.toString().substring(
-                0, ALLINONE_VERSION.toString().length() - 2
-        )
-        println("checkout branch from master")
-        "git checkout -b ${remoteBranchName} origin/master".execute()
-//        //从主分支拉 要打 Tag
-        "git tag -a ${tag} -m ''".execute()
-        "git push origin ${tag}".execute()
+    def version = env(VERSION)
+    def branchT = "git show-ref --verify refs/heads/${remoteBranchName}".execute()
+    def exist = false
+    if (branchT.inputStream.text?.trim()) {
+        //存在重复分支
+        exist = true
+    }
+    if (exist) {
+        //存在重复分支
+        println("local branch: ${remoteBranchName} exist ")
+        "git checkout ${remoteBranchName}".execute()
+        "git pull ".execute()
     } else {
-        //从release 分支拉
-        println("checkout branch from release")
-        "git checkout -b ${remoteBranchName} origin/${remoteBranchName}".execute()
+        if (checkBranch(version, errorMsg)) {
+            tag = "r" + version.toString().substring(
+                    0, version.toString().length() - 2
+            )
+            println("checkout branch from master")
+            "git checkout -b ${remoteBranchName} origin/master".execute()
+//        //从主分支拉 要打 Tag
+            "git tag -a ${tag} -m ''".execute()
+            "git push origin ${tag}".execute()
+        } else {
+            //从release 分支拉
+            println("checkout branch from release")
+            "git checkout -b ${remoteBranchName} origin/${remoteBranchName}".execute()
+        }
     }
 
 }
 
+boolean checkVersion(String sdk_version, String errorMsg) {
+    def versions = sdk_version.split("\\.")
+    if (versions.size() != 4) {
+        //版本号出错
+        throw new Exception(errorMsg)
+    }
+    if (envToBoolean(IS_TEST.toString(), false)) {
+        return false
+    }
+    def tagP = "git tag".execute()
+    def tagArray = tagP.inputStream.text.split("\n")
+    def repeat = false
+    tagArray.each {
+        println("tag ${sdk_version}")
+        if (it.contains(sdk_version) && sdk_version?.trim()) {
+            println("重复")
+            repeat = true
+        }
+    }
+    println("重复${repeat}")
+    if (repeat) {
+        return false
+    }
+    return true
+
+}
 /**
  * 推送 version.txt 和 dependence.gradle 到git
  * @return
  */
-def pushVersionAndGradlToGit(String remoteBranch,String commitMsg) {
-    def tag = "v" + ALLINONE_VERSION.toString()
-    def statusP = "git status".execute()
-    println("git status:\n" + statusP.inputStream.text)
-    statusP.waitFor()
+task pushVersionAndGradlToGit {
+    doLast {
+        println("start push to git ")
+        if (!checkVersion(sdk_version, errorMsg)) {
+            //如果不是release 版本不推送git
+            return
+        }
+        def tag = "v" + env(VERSION)
+        def statusP = "git status".execute()
+        println("git status:\n" + statusP.inputStream.text)
+        statusP.waitFor()
 
-    def addP = "git add version/version.gradle".execute()
-    println("git add:\n" + addP.inputStream.text)
-    addP.waitFor()
+        def addVP = "git add .".execute()
+        println("git add:\n" + addVP.inputStream.text)
+        addVP.waitFor()
 
-    def addP2 = "git add app/dependence.gradle".execute()
-    println("git add:\n" + addP2.inputStream.text)
-    addP2.waitFor()
+        def commitP = "git commit -m '${commitMsg}'".execute()
+        println("git commit:\n" + commitP.inputStream.text)
+        commitP.waitFor()
 
-    def commitP = "git commit -m '${commitMsg}'".execute()
-    println("git commit:\n" + commitP.inputStream.text)
-    commitP.waitFor()
 
-    def pushP = "git push origin ${remoteBranch}:${remoteBranch}".execute()
-    println("git push:\n" + pushP.inputStream.text)
-    pushP.waitFor()
+        def tagP = "git tag -a ${tag} -m ''".execute()
+        println("git tag:\n" + tagP.inputStream.text)
+        tagP.waitFor()
 
-    def tagP = "git tag -a ${tag} -m ''".execute()
-    println("git tag:\n" + tagP.inputStream.text)
-    tagP.waitFor()
+        def pushP = "git push origin ${remoteBranch}:${remoteBranch}".execute()
+        println("git push:\n" + pushP.inputStream.text)
+        pushP.waitFor()
+    }
 
-    def pushTagP = "git push origin ${remoteBranch} ${tag}".execute()
-    println("git push tag:\n" + pushTagP.inputStream.text)
-    pushTagP.waitFor()
 }
+
+
 /**
  * git推送 task
  */
 task startGit {
-    if (!IS_RELEASE.toBoolean()) {
-        //如果不是release 版本不推送git
+    println("start git command")
+    if (!checkVersion(sdk_version, errorMsg)) {
         return
     }
+
     doLast {
         //先拉分支 打tag
         checkoutLocalBranch(remoteBranch, errorMsg)
