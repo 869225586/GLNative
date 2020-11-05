@@ -84,7 +84,7 @@ publishing {
             // 依赖 bundleReleaseAar 任务，并上传其产出的aar
 //            afterEvaluate { artifact(tasks.getByName("assembleDebug")) }
             // 也可以指定上传的AAR包，但是需要先手动生成aar
-             artifact("${this.buildDir}/outputs/aar/com_kwai_video_allinone_v1.0.0.aar")
+             artifact("${this.buildDir}/outputs/aar/xxxx_v1.0.0.aar")
             // 上传source，这样使用放可以看到方法注释
 //            artifact androidSourcesJar
             // pom文件中声明依赖，从而传递到使用方
