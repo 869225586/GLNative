@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply from : 'git.gradle'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -68,4 +67,17 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
+}
+task testTag{
+        def type = "ffmpeg,libyuv"
+        //自定义包
+        def moudleArr = type.split(",")
+        moudleArr.each {
+            def key = rootProject.ext.moudleMap[it]
+            if (key?.toString()?.trim()) {
+                def moudleAAr = System.getenv(key)
+                println("${it}: " + moudleAAr + "\n")
+            }
+        }
+
 }

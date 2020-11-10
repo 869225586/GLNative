@@ -24,3 +24,13 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+ext{
+    moudleMap = [
+            ffmpeg                  : "FFMPEG_VERSION",
+            audioprocess            : "AUDIOPROCESS_VERSION",
+            ksturbojpeglib          : "KSTURBOJPEGLIB_VERSION",
+            libyuv                  : "LIBYUV_VERSION",
+            libuv                   : "LIBUV_VERSION",
+            kscppprotobuf           : "KSCPPPROTOBUF_VERSION",
+            ]
+}

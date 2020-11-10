@@ -17,7 +17,7 @@ boolean checkBranch(String version, String errorMsg) {
         def tagArray = tagP.inputStream.text.split("\n")
         def lastIndex = -1
         for (int i = 0; i < tagArray.size(); i++) {
-            if (tagArray[i].contains(version.substring(0,version.length()-2))) {
+            if (tagArray[i].contains(version.substring(0, version.length() - 2))) {
                 lastIndex = i
             }
         }
@@ -57,18 +57,28 @@ def checkoutLocalBranch(String remoteBranchName, String errorMsg) {
     if (exist) {
         //存在重复分支
         println("local branch: ${remoteBranchName} exist ")
-        "git checkout ${remoteBranchName}".execute()
-        "git pull ".execute()
+        def checkP = "git checkout ${remoteBranchName}".execute()
+        println("git checkout:\n" + checkP.inputStream.text)
+        checkP.waitFor()
+        def pullP = "git pull ".execute()
+        println("git pull:\n" + pullP.inputStream.text)
+        pullP.waitFor()
     } else {
         if (checkBranch(version, errorMsg)) {
             tag = "r" + version.toString().substring(
                     0, version.toString().length() - 2
             )
-            println("checkout branch from master")
-            "git checkout -b ${remoteBranchName} origin/master".execute()
-//        //从主分支拉 要打 Tag
-            "git tag -a ${tag} -m ''".execute()
-            "git push origin ${tag}".execute()
+            def checkPB = "git checkout -b ${remoteBranchName} origin/syy/v0.2.0".execute()
+            println("git checkout:\n" + checkPB.inputStream.text)
+            checkPB.waitFor()
+            println("checkout branch from syy/v0.2.0")
+            //从主分支拉 要打 Tag
+            def tagP = "git tag -a ${tag} -m '新版本tag'".execute()
+            println("git tag:\n" + tagP.inputStream.text)
+            tagP.waitFor()
+            def pushT = "git push origin ${tag}".execute()
+            println("git push Tag:\n" + pushT.inputStream.text)
+            pushT.waitFor()
         } else {
             //从release 分支拉
             println("checkout branch from release")
@@ -84,7 +94,7 @@ boolean checkVersion(String sdk_version, String errorMsg) {
         //版本号出错
         throw new Exception(errorMsg)
     }
-    if (envToBoolean(IS_TEST.toString(), false)) {
+    if (envToBoolean(IS_TEST, false)) {
         return false
     }
     def tagP = "git tag".execute()
@@ -93,12 +103,11 @@ boolean checkVersion(String sdk_version, String errorMsg) {
     tagArray.each {
         println("tag ${sdk_version}")
         if (it.contains(sdk_version) && sdk_version?.trim()) {
-            println("重复")
             repeat = true
         }
     }
-    println("重复${repeat}")
     if (repeat) {
+        println("repeat local branch")
         return false
     }
     return true
@@ -139,21 +148,20 @@ task pushVersionAndGradlToGit {
     }
 
 }
-
-
 /**
  * git推送 task
  */
 task startGit {
-    println("start git command")
+    println("start checkout branch ")
     if (!checkVersion(sdk_version, errorMsg)) {
         return
     }
-
-    doLast {
-        //先拉分支 打tag
-        checkoutLocalBranch(remoteBranch, errorMsg)
-    }
+    //先拉分支 打tag
+    checkoutLocalBranch(remoteBranch, errorMsg)
+    println("checkout branch finish")
 }
+
+
+
 
 

@@ -9,7 +9,7 @@ def versionList = []
 def moudles = this.rootProject.getAllprojects()
 def POM_VERSION = getPomVersion()
 def POM_ARTIFACTID = "allinone"//项目名称id
-def POM_GROUPID = 'xx.xxx.xx'  //项目组id
+def POM_GROUPID = 'com.kwai.video'  //项目组id
 def POM_PACKAGING = 'aar'
 def POM_DESCRIPTION = 'update version' + env(VERSION)
 def NEXUS_USERNAME = 'admin'   //用户名
@@ -28,11 +28,11 @@ String getPomVersion() {
     def id = build_number ? build_number.toInteger() : 1
     def pomversion
     if (type == SDK_TYPE_ALL.toString()) {
-        pomversion= "v${version}-pb${pbversion}-${id}"
+        pomversion = "v${version}-pb${pbversion}-${id}"
     } else if (type == SDK_TYPE_SHORT.toString()) {
-        pomversion= "v${version}-shortvideo-pb${pbversion}-${id}"
+        pomversion = "v${version}-shortvideo-pb${pbversion}-${id}"
     } else if (type == SDK_TYPE_LIVE.toString()) {
-        pomversion= "v${version}-live-pb${pbversion}-${id}"
+        pomversion = "v${version}-live-pb${pbversion}-${id}"
     } else {
         def moudleArr = type.split(",")
         def versionStr = "v${version}-"
@@ -41,9 +41,10 @@ String getPomVersion() {
         }
         pomversion = versionStr + "pb${pbversion}-${id}"
     }
-    if(env(IS_TEST)){
-        pomversion +="-test"
+    if (envToBoolean(IS_TEST, false)) {
+        pomversion += "-test"
     }
+    println("the aar  version is ${pomversion}")
     return pomversion
 }
 
@@ -70,7 +71,7 @@ task loadDependence {
         //基础sdk
         def ffmpeg = env(FFMPEG_VERSION)
         dependenceList << ffmpeg
-        versionList << "ffmpeng: " + ffmpeg + "\n"
+        versionList << "ffmpeg: " + ffmpeg + "\n"
 
         def audioprocess = env(AUDIOPROCESS_VERSION)
         dependenceList << audioprocess
@@ -191,7 +192,7 @@ task loadDependence {
 
 //保存version 文件
 task saveVersionFile {
-    if (IS_TEST.toBoolean()) {
+    if (envToBoolean(IS_TEST, false)) {
         //如果不是release 版本不保存 版本信息
         return
     }
@@ -303,6 +304,10 @@ tasks.whenTaskAdded {
     task ->
         if (task.name == "pushVersionAndGradlToGit") {
             task.dependsOn 'changeDependenceBuild'
+        }
+        if (task.name == "saveVersionFile") {
+            println("")
+            task.mustRunAfter 'startGit'
         }
 }
 //发布aar到仓库
