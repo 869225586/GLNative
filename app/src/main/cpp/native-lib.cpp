@@ -98,6 +98,9 @@ Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_playFromFFmpeg(JNIEnv *env, job
         LOGD("calljava1");
         callJava = new CallJava(javaVM, env, &thiz);
     }
+    if (opengl == NULL) {
+        opengl = new Opengl(callJava);
+    }
     const char *source = env->GetStringUTFChars(url, 0);
     opengl->preparedFromFFmpeg(playStatus, callJava, source);
 }

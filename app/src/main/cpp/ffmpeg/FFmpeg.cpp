@@ -27,6 +27,7 @@ void *decodeFFmpeg(void *data) {
 
 void FFmpeg::preapared() {
     pthread_create(&decodeThread, NULL, decodeFFmpeg, this);
+    LOGD("decodeThread Create");
 }
 
 /**

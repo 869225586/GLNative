@@ -18,8 +18,11 @@ void callback_SurfaceCrete(void *ctx) {
             wlOpengl->baseRender->onCreate();
         }
     }
-//    wlOpengl->ffmpeg->preapared();
-//    wlOpengl->ffmpeg->videoPlayer->setCallYUV(callback_yuv, wlOpengl);
+    LOGD("toPlay");
+    if(wlOpengl->ffmpeg!=NULL){
+        wlOpengl->ffmpeg->preapared();
+        wlOpengl->ffmpeg->videoPlayer->setCallYUV(callback_yuv, wlOpengl);
+    }
 }
 
 void callback_SurfacChange(int width, int height, void *ctx) {
@@ -83,6 +86,7 @@ void Opengl::onCreateSurface(JNIEnv *env, jobject surface) {
     wlEglThread->setDestroyCallBack(callback_SurfaceDestroy, this);
 
     wlEglThread->onSurfaceCreate(nativeWindow);
+    LOGD("surfaceCreate");
 }
 
 void Opengl::onChangeSurface(int width, int height) {
@@ -153,11 +157,12 @@ void Opengl::setYuvData(void *y, void *u, void *v, int w, int h) {
 
 void Opengl::preparedFromFFmpeg(PlayStatus *playStatus, CallJava *callJava, const char *url) {
     ffmpeg = new FFmpeg(playStatus, callJava, url);
+    LOGD("ffmpegPrepare");
 }
 
 Opengl::Opengl(CallJava *callJava) {
-//    baseRender = new FilFilterVboYuv();
-    baseRender = new CameraRender(callJava);
+    baseRender = new FilFilterVboYuv();
+//    baseRender = new CameraRender(callJava);
 }
 
 

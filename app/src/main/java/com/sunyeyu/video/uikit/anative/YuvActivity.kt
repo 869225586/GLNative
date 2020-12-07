@@ -3,6 +3,7 @@ package com.sunyeyu.video.uikit.anative
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.sunyeyu.video.uikit.opengl.MyTextureView
 import com.sunyeyu.video.uikit.opengl.NativeOpengl
 import com.sunyeyu.video.uikit.opengl.WlSurfaceView
 import java.io.File
@@ -63,14 +64,24 @@ class YuvActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_yuv)
         var wl = findViewById<WlSurfaceView>(R.id.wsurface);
+        var textureview = findViewById<MyTextureView>(R.id.textureview)
         nativeOpengl = NativeOpengl()
-        wl.setNativeOpengl(nativeOpengl);
-        wl.setOnSurfaceListener(object : WlSurfaceView.OnSurfaceListener {
+        textureview.setNativeOpengl(nativeOpengl)
+        nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4");
+        textureview.setOnSurfaceListener {object : WlSurfaceView.OnSurfaceListener {
             override fun init() {
-                nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/03/21/mp4/190321153853126488.mp4");
+                Log.i("syy","prepareFrom Java")
+
 //                 play();
             }
-        });
+        }}
+//        wl.setNativeOpengl(nativeOpengl);
+//        wl.setOnSurfaceListener(object : WlSurfaceView.OnSurfaceListener {
+//            override fun init() {
+//                nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4");
+////                 play();
+//            }
+//        });
 
     }
 
@@ -109,5 +120,4 @@ class YuvActivity : AppCompatActivity() {
             }
         }).start()
     }
-
 }

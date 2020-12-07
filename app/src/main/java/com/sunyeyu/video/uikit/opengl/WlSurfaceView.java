@@ -4,11 +4,12 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 public class WlSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 
     private NativeOpengl nativeOpengl;
-
+    private SurfaceHolder mSurfaceHolder;
     private OnSurfaceListener onSurfaceListener;
     NativeOpengl.OnCameraTextureCall onCameraTextureCall;
     public void setOnSurfaceListener(OnSurfaceListener onSurfaceListener) {
@@ -34,12 +35,15 @@ public class WlSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        if(nativeOpengl != null)
+        if(nativeOpengl != null&&mSurfaceHolder==null)
         {
+            mSurfaceHolder=surfaceHolder;
             nativeOpengl.setSurface(surfaceHolder.getSurface());
 //            nativeOpengl.surfaceCreate(surfaceHolder.getSurface());
             if(onSurfaceListener!=null)
                 onSurfaceListener.init();
+        }else{
+
         }
     }
 
@@ -50,10 +54,11 @@ public class WlSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        if(nativeOpengl != null)
-        {
-            nativeOpengl.surfaceDestroy();
-        }
+
+//        if(nativeOpengl != null)
+//        {
+//            nativeOpengl.surfaceDestroy();
+//        }
     }
     public interface OnSurfaceListener
     {
@@ -61,4 +66,8 @@ public class WlSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     }
 
+    @Override
+    protected void onWindowVisibilityChanged(int visibility) {
+        super.onWindowVisibilityChanged(View.VISIBLE);
+    }
 }
