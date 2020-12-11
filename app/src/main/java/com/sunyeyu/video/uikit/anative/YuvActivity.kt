@@ -60,6 +60,7 @@ http://vfx.mtime.cn/Video/2019/03/12/mp4/190312083533415853.mp4
 http://vfx.mtime.cn/Video/2019/03/09/mp4/190309153658147087.mp4
  */
 class YuvActivity : AppCompatActivity() {
+    var isClick=true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_yuv)
@@ -67,22 +68,17 @@ class YuvActivity : AppCompatActivity() {
         var textureview = findViewById<MyTextureView>(R.id.textureview)
         nativeOpengl = NativeOpengl()
         textureview.setNativeOpengl(nativeOpengl)
-        nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4");
-        textureview.setOnSurfaceListener {object : WlSurfaceView.OnSurfaceListener {
-            override fun init() {
-                Log.i("syy","prepareFrom Java")
-
-//                 play();
+        nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/03/14/mp4/190314102306987969.mp4");
+        textureview.setOnSurfaceListener { WlSurfaceView.OnSurfaceListener { Log.i("syy","prepareFrom Java") } }
+        textureview.setOnClickListener {
+            if(isClick){
+                isClick = false;
+                nativeOpengl.pause()
+            }else{
+                isClick = true;
+                nativeOpengl.resume()
             }
-        }}
-//        wl.setNativeOpengl(nativeOpengl);
-//        wl.setOnSurfaceListener(object : WlSurfaceView.OnSurfaceListener {
-//            override fun init() {
-//                nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4");
-////                 play();
-//            }
-//        });
-
+        }
     }
 
     lateinit var fis: FileInputStream;

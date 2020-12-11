@@ -43,6 +43,10 @@ public class NativeOpengl {
 
     public native void playFromFFmpeg(String url);
 
+    public native void pause();
+
+    public native void resume();
+
     public void initSurfaceTextture(int cameraTextureId) {
         if (onCameraTextureCall != null) {
             onCameraTextureCall.callTextTure(cameraTextureId);

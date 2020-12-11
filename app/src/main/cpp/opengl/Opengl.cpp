@@ -165,4 +165,17 @@ Opengl::Opengl(CallJava *callJava) {
 //    baseRender = new CameraRender(callJava);
 }
 
+void Opengl::pause() {
+   if(ffmpeg!=NULL){
+       ffmpeg->pause();
+   }
+}
+
+void Opengl::resume() {
+    if(ffmpeg!=NULL){
+        ffmpeg->resume();
+    }
+
+}
+
 

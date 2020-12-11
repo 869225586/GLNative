@@ -224,6 +224,7 @@ void FFmpeg::pause() {
     if (audioPlayer != NULL) {
         audioPlayer->pause();
     }
+
 }
 
 void FFmpeg::resume() {

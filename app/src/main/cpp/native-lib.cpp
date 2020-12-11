@@ -105,3 +105,18 @@ Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_playFromFFmpeg(JNIEnv *env, job
     opengl->preparedFromFFmpeg(playStatus, callJava, source);
 }
 
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_pause(JNIEnv *env, jobject thiz) {
+    if (opengl == NULL) {
+        opengl = new Opengl(callJava);
+    }
+    opengl->pause();
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_resume(JNIEnv *env, jobject thiz) {
+    if (opengl == NULL) {
+        opengl = new Opengl(callJava);
+    }
+    opengl->resume();
+}
