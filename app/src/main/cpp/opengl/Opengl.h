@@ -26,6 +26,7 @@ public:
     int pic_width;
     int pic_height;
     void *pilex = NULL;
+    bool fullscreen;
 
 public:
     Opengl(CallJava *callJava);
@@ -49,6 +50,8 @@ public:
     void pause();
 
     void resume();
+
+    void changeFullScreen(bool fuscreen);
 };
 
 

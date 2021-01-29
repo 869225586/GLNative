@@ -119,4 +119,10 @@ Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_resume(JNIEnv *env, jobject thi
         opengl = new Opengl(callJava);
     }
     opengl->resume();
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_changewindow(JNIEnv *env, jobject thiz,
+                                                              jboolean fullscreen) {
+    // TODO: implement changewindow()
+     opengl->changeFullScreen(fullscreen);
 }

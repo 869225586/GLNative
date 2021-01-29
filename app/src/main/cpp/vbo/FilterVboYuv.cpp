@@ -164,6 +164,7 @@ void FilFilterVboYuv::destroyData() {
 
 void FilFilterVboYuv::setMatrix(int width, int height) {
     initMatrix(matrix);
+    LOGV("change  width %d,height %d",width,height);
     if (yuv_wdith > 0 && yuv_height > 0) {
         float screen_r = 1.0 * width / height;
         float picture_r = 1.0 * yuv_wdith / yuv_height;
@@ -175,6 +176,9 @@ void FilFilterVboYuv::setMatrix(int width, int height) {
             float r = height / (1.0 * width / yuv_wdith * yuv_height);
             orthoM(-1, 1, -r, r, matrix);
         }
+    }
+    if(fullScreen){
+        rotateMatrixZ(90,matrix);
     }
 }
 
@@ -204,4 +208,8 @@ void FilFilterVboYuv::setYuvData(void *Y, void *U, void *V, int width, int heigh
         memcpy(u, U, yuv_wdith * yuv_height / 4);
         memcpy(v, V, yuv_wdith * yuv_height / 4);
     }
+}
+
+void FilFilterVboYuv::changeFullScreen(bool fullScreen) {
+    this->fullScreen = fullScreen;
 }

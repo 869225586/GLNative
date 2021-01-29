@@ -178,4 +178,10 @@ void Opengl::resume() {
 
 }
 
+void Opengl::changeFullScreen(bool fuscreen) {
+     if(baseRender!=NULL){
+         baseRender->changeFullScreen(fuscreen);
+     }
+}
+
 

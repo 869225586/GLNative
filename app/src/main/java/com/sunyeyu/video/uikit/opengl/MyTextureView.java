@@ -45,11 +45,13 @@ public class MyTextureView extends TextureView {
 
             @Override
             public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
+                Log.i("hhh","surface change "+width+"=="+height);
+                nativeOpengl.surfaceChange(width,height);
             }
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                nativeOpengl.surfaceDestroy();
                 return false;
             }
 
@@ -69,5 +71,7 @@ public class MyTextureView extends TextureView {
     }
 
 
-
+   public void startFullScreen(){
+            nativeOpengl.changewindow(true);
+   }
 }

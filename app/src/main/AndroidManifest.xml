@@ -17,7 +17,9 @@
             android:name="com.sunyeyu.video.uikit.anative.CameraActivity"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name="com.sunyeyu.video.uikit.anative.YuvActivity">
+        <activity
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:name="com.sunyeyu.video.uikit.anative.YuvActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

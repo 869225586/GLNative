@@ -47,6 +47,7 @@ public class NativeOpengl {
 
     public native void resume();
 
+    public native void changewindow(boolean fullscreen);
     public void initSurfaceTextture(int cameraTextureId) {
         if (onCameraTextureCall != null) {
             onCameraTextureCall.callTextTure(cameraTextureId);

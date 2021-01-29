@@ -1,7 +1,10 @@
 package com.sunyeyu.video.uikit.anative
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.sunyeyu.video.uikit.opengl.MyTextureView
 import com.sunyeyu.video.uikit.opengl.NativeOpengl
@@ -60,31 +63,57 @@ http://vfx.mtime.cn/Video/2019/03/12/mp4/190312083533415853.mp4
 http://vfx.mtime.cn/Video/2019/03/09/mp4/190309153658147087.mp4
  */
 class YuvActivity : AppCompatActivity() {
-    var isClick=true
+    var isClick = true
+    lateinit var fis: FileInputStream;
+    lateinit var nativeOpengl: NativeOpengl
+    lateinit var ll_window:LinearLayout //窗口容器
+    lateinit var ll_full_screen:LinearLayout //全屏容器
+    lateinit var myTextureView: MyTextureView
+    var isexit = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_yuv)
-        var wl = findViewById<WlSurfaceView>(R.id.wsurface);
-        var textureview = findViewById<MyTextureView>(R.id.textureview)
+        ll_window =findViewById(R.id.ll_window)
+        ll_full_screen = findViewById(R.id.ll_full_screen)
+        myTextureView = MyTextureView(this);
+        var lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT)
+        ll_window.addView(myTextureView,lp)
         nativeOpengl = NativeOpengl()
-        textureview.setNativeOpengl(nativeOpengl)
-        nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/03/14/mp4/190314102306987969.mp4");
-        textureview.setOnSurfaceListener { WlSurfaceView.OnSurfaceListener { Log.i("syy","prepareFrom Java") } }
-        textureview.setOnClickListener {
-            if(isClick){
+        myTextureView.setNativeOpengl(nativeOpengl)
+        nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/03/09/mp4/190309153658147087.mp4");
+        myTextureView.setOnSurfaceListener {
+            WlSurfaceView.OnSurfaceListener {
+                Log.i(
+                    "syy",
+                    "prepareFrom Java"
+                )
+            }
+        }
+        myTextureView.setOnClickListener {
+            if (isClick) {
                 isClick = false;
                 nativeOpengl.pause()
-            }else{
+            } else {
                 isClick = true;
                 nativeOpengl.resume()
             }
         }
     }
 
-    lateinit var fis: FileInputStream;
-    lateinit var nativeOpengl: NativeOpengl
-    var isexit = false
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        }
+
+    override fun onDestroy() {
+        super.onDestroy()
+//        nativeOpengl.surfaceDestroy();
+
+    }
+    /**
+     * 解析本地yuv 视频
+     */
     fun play() {
         Thread(Runnable {
             val w = 640
@@ -115,5 +144,12 @@ class YuvActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         }).start()
+    }
+
+    fun fullScreen(view: View) {
+        ll_window.removeView(myTextureView)
+        myTextureView.startFullScreen()
+        var lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT)
+        ll_full_screen.addView(myTextureView,lp)
     }
 }

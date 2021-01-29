@@ -28,6 +28,7 @@ public:
     void *v = NULL; //v 数据
     int yuv_wdith = 0;
     int yuv_height = 0;
+    bool  fullScreen = false;
 public:
     FilFilterVboYuv();
 
@@ -49,6 +50,7 @@ public:
     //设置y u v  数据
     void setYuvData(void *y, void *u, void *v, int width, int height);
 
+    void changeFullScreen(bool fullScreen);
 };
 
 

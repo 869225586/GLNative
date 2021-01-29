@@ -10,4 +10,6 @@
 
 #define LOGE(FORMAT, ...) __android_log_print(ANDROID_LOG_DEBUG, "syy", FORMAT, ##__VA_ARGS__);
 
+#define LOGV(FORMAT,...) __android_log_print(ANDROID_LOG_DEBUG,"hhh",FORMAT,##__VA_ARGS__);
+
 #endif //NATIVE_ANDROIDLOG_H
