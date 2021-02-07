@@ -55,13 +55,14 @@ void FFmpeg::decodeFFmpegThread() {
     //防止播放退出还在请求网络 设置了一个回调
     pFormatCtx->interrupt_callback.callback = avformat_callback;
     pFormatCtx->interrupt_callback.opaque = this;
-
-    if (avformat_open_input(&pFormatCtx, url, NULL, NULL) != 0) {
-        LOGE("can not open url : %s", url);
+    int result = avformat_open_input(&pFormatCtx, url, NULL, NULL);
+    if (result!= 0) {
+        LOGE("can not open url : %s,%s,%d", url,"error_code",result)
         //TODO 回调给native 端
         exitByInitError();
         return;
     }
+
     if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
         LOGE("没有找到 媒体流 ");
 
@@ -72,7 +73,7 @@ void FFmpeg::decodeFFmpegThread() {
     for (int i = 0; i < pFormatCtx->nb_streams; i++) {
         AVStream *avStream = pFormatCtx->streams[i];
         if (avStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-            LOGD("解析到音频流");
+            LOGE("解析到音频流");
             //获取到音频
             if (audioPlayer == NULL) {
                 audioPlayer = new AudioPlayer(playStatus, avStream->codecpar->sample_rate);
@@ -84,7 +85,7 @@ void FFmpeg::decodeFFmpegThread() {
                 duration = audioPlayer->duration;
             }
         } else if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            LOGD("解析到视频流");
+            LOGE("解析到视频流");
             //得到视频流
             if (!isCreateVideo) {
                 videoPlayer->streamIndex = i;
@@ -312,24 +313,24 @@ void FFmpeg::release() {
         sleepCount++;
         av_usleep(1000 * 10);//暂停10毫秒
     }
-    LOGE("释放 Audio");
     if (audioPlayer != NULL) {
         audioPlayer->release();
         delete (audioPlayer);
         audioPlayer = NULL;
+        LOGE("释放 Audio");
     }
 
-    LOGE("释放 video");
     if (videoPlayer != NULL) {
         videoPlayer->release();
         delete (videoPlayer);
         videoPlayer = NULL;
+        LOGE("释放 video");
     }
-    LOGE("释放 封装格式上下文");
     if (pFormatCtx != NULL) {
         avformat_close_input(&pFormatCtx);
         avformat_free_context(pFormatCtx);
         pFormatCtx = NULL;
+        LOGE("释放 封装格式上下文");
     }
     LOGE("释放 callJava");
     /* if(callJava != NULL)
@@ -340,6 +341,7 @@ void FFmpeg::release() {
     if (playStatus != NULL) {
         playStatus = NULL;
     }
+
     pthread_mutex_unlock(&init_mutex);
 }
 

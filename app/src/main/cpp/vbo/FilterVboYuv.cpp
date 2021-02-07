@@ -211,5 +211,6 @@ void FilFilterVboYuv::setYuvData(void *Y, void *U, void *V, int width, int heigh
 }
 
 void FilFilterVboYuv::changeFullScreen(bool fullScreen) {
+    LOGD("change full screen");
     this->fullScreen = fullScreen;
 }

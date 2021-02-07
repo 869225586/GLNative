@@ -79,6 +79,7 @@ class YuvActivity : AppCompatActivity() {
         myTextureView = MyTextureView(this);
         var lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT)
         ll_window.addView(myTextureView,lp)
+        Log.i("syy","oncreate")
         nativeOpengl = NativeOpengl()
         myTextureView.setNativeOpengl(nativeOpengl)
         nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/03/09/mp4/190309153658147087.mp4");
@@ -108,7 +109,7 @@ class YuvActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-//        nativeOpengl.surfaceDestroy();
+        nativeOpengl.surfaceDestroy();
 
     }
     /**

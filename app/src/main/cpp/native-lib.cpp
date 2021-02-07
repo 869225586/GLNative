@@ -50,6 +50,11 @@ Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_surfaceDestroy(JNIEnv *env, job
     opengl->onDestorySurface();
     delete opengl;
     opengl = NULL;
+    //destroy 一定要将 变量的都删除 值为 null 不然 进场不杀死 activity 退出这个变量还存在
+    //造成很多问题
+    delete playStatus;
+    playStatus = NULL;
+
 
 }extern "C"
 JNIEXPORT void JNICALL
@@ -95,7 +100,7 @@ Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_playFromFFmpeg(JNIEnv *env, job
         playStatus = new PlayStatus();
     }
     if (callJava == NULL) {
-        LOGD("calljava1");
+
         callJava = new CallJava(javaVM, env, &thiz);
     }
     if (opengl == NULL) {

@@ -51,7 +51,6 @@ public class MyTextureView extends TextureView {
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                nativeOpengl.surfaceDestroy();
                 return false;
             }
 

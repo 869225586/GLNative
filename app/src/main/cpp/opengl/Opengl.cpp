@@ -161,6 +161,7 @@ void Opengl::preparedFromFFmpeg(PlayStatus *playStatus, CallJava *callJava, cons
 }
 
 Opengl::Opengl(CallJava *callJava) {
+    LOGD("initOpenGl");
     baseRender = new FilFilterVboYuv();
 //    baseRender = new CameraRender(callJava);
 }
