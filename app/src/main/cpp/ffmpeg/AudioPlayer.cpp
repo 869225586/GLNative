@@ -128,10 +128,11 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
         int buffersize = wlAudio->resampleAudio();
         if (buffersize > 0) {
             wlAudio->clock += buffersize / ((double) (wlAudio->sample_rate * 2 * 2));
-            if (wlAudio->clock - wlAudio->preTime >= 0.1) {
+            if (wlAudio->clock - wlAudio->preTime >= 0.5) { //间隔多久回调 0.5秒
                 wlAudio->preTime = wlAudio->clock;
+                LOGD("curPos %f",wlAudio->clock);
                 //回调应用层
-//                wlAudio->callJava->onCallTimeInfo(CHILD_THREAD, wlAudio->clock, wlAudio->duration);
+                wlAudio->callJava->onCallTimeInfo(wlAudio->clock, wlAudio->duration);
             }
             (*wlAudio->pcmBufferQueue)->Enqueue(wlAudio->pcmBufferQueue, (char *) wlAudio->buffer,
                                                 buffersize);
@@ -308,25 +309,12 @@ void AudioPlayer::release() {
     if (playStatus != NULL) {
         playStatus = NULL;
     }
-//    if(callJava != NULL)
-//    {
-//        callJava = NULL;
-//    }
+    if(callJava != NULL)
+    {
+        callJava = NULL;
+    }
 }
 
-AudioPlayer::AudioPlayer(PlayStatus *playStatus, int sample_rate) {
-    this->playStatus = playStatus;
-    this->sample_rate = sample_rate;
-    queue = new StreamQueue(playStatus);
-    //码率，是指一个数据流中每秒钟能通过的信息量，单位bps（bit per second）
-    //码率 = 采样率 * 采样位数 * 声道数
-    //计算出 pcm 数据大小  这里计算的是字节   采样位数 一般有 8bit  16bit 32 bit
-    //所以这里计算的buffer 大小 我们 一般是 双声道 2  * 采样位数 16 bit =2 字节
-    //buffer = 采样率（sample_rate）*采样位数（16 bit/8bit =2 byte） *声道数（2）
-    buffer = static_cast<uint8_t *>(av_malloc(sample_rate * 2 * 2));
-    pthread_mutex_init(&codecMutex, NULL);
-
-}
 
 AudioPlayer::~AudioPlayer() {
     pthread_mutex_destroy(&codecMutex);
@@ -342,4 +330,18 @@ void AudioPlayer::releaseAvFrame() {
     av_frame_free(&avFrame);
     av_free(avFrame);
     avFrame = NULL;
+}
+
+AudioPlayer::AudioPlayer(PlayStatus *playStatus, int sample_rate, CallJava *callJava) {
+    this->playStatus = playStatus;
+    this->sample_rate = sample_rate;
+    queue = new StreamQueue(playStatus);
+    //码率，是指一个数据流中每秒钟能通过的信息量，单位bps（bit per second）
+    //码率 = 采样率 * 采样位数 * 声道数
+    //计算出 pcm 数据大小  这里计算的是字节   采样位数 一般有 8bit  16bit 32 bit
+    //所以这里计算的buffer 大小 我们 一般是 双声道 2  * 采样位数 16 bit =2 字节
+    //buffer = 采样率（sample_rate）*采样位数（16 bit/8bit =2 byte） *声道数（2）
+    buffer = static_cast<uint8_t *>(av_malloc(sample_rate * 2 * 2));
+    pthread_mutex_init(&codecMutex, NULL);
+    this->callJava = callJava;
 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
-    tools:context=".YuvActivity">
+    tools:context=".PlayerActivity">
 
     <com.sunyeyu.video.uikit.opengl.WlSurfaceView
         android:layout_width="match_parent"
@@ -20,6 +20,24 @@
         android:layout_height="300dp"
         android:orientation="vertical"
         ></LinearLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_below="@+id/ll_window"
+        android:id="@+id/ll_seek"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <SeekBar
+            android:id="@+id/seekbar"
+            android:max="100"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:layout_marginLeft="15dp"
+            android:id="@+id/duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
 
     <com.sunyeyu.video.uikit.opengl.MyTextureView
         android:visibility="gone"
@@ -28,7 +46,7 @@
         android:id="@+id/textureview"
         />
     <LinearLayout
-        android:layout_below="@+id/ll_window"
+        android:layout_below="@+id/ll_seek"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:layout_width="match_parent"

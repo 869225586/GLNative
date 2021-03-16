@@ -185,4 +185,8 @@ void Opengl::changeFullScreen(bool fuscreen) {
      }
 }
 
+long Opengl::getDuration() {
+    return ffmpeg->duration;
+}
+
 

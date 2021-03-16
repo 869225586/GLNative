@@ -128,6 +128,9 @@ Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_resume(JNIEnv *env, jobject thi
 JNIEXPORT void JNICALL
 Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_changewindow(JNIEnv *env, jobject thiz,
                                                               jboolean fullscreen) {
-    // TODO: implement changewindow()
      opengl->changeFullScreen(fullscreen);
+}extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_getDuration(JNIEnv *env, jobject thiz) {
+     return opengl->getDuration();
 }

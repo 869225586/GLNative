@@ -2,13 +2,19 @@ package com.sunyeyu.video.uikit.anative
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.postDelayed
 import com.sunyeyu.video.uikit.opengl.MyTextureView
 import com.sunyeyu.video.uikit.opengl.NativeOpengl
 import com.sunyeyu.video.uikit.opengl.WlSurfaceView
+import com.sunyeyu.video.uikit.util.LogUtils
+import com.sunyeyu.video.uikit.util.TimeUtil
 import java.io.File
 import java.io.FileInputStream
 
@@ -62,35 +68,67 @@ http://vfx.mtime.cn/Video/2019/03/12/mp4/190312083533415853.mp4
 
 http://vfx.mtime.cn/Video/2019/03/09/mp4/190309153658147087.mp4
  */
-class YuvActivity : AppCompatActivity() {
+class PlayerActivity : AppCompatActivity() {
     var isClick = true
     lateinit var fis: FileInputStream;
     lateinit var nativeOpengl: NativeOpengl
     lateinit var ll_window:LinearLayout //窗口容器
     lateinit var ll_full_screen:LinearLayout //全屏容器
     lateinit var myTextureView: MyTextureView
+    lateinit var tv_time :TextView;
+    lateinit var seekbar:SeekBar;
     var isexit = false
+    private var handler :Handler = object : Handler(){
+
+    }
+    public var runnable :Runnable = object :Runnable {
+        override fun run() {
+            LogUtils.I("---"+nativeOpengl.currentPos)
+            var totalduration = nativeOpengl.duration
+            var currentpos = nativeOpengl.currentPos
+            tv_time.text=TimeUtil.getMinute(currentpos.toLong())+"/"+TimeUtil.getMinute(totalduration)
+            seekbar.progress = (currentpos/(totalduration*1.0f/100)).toInt()
+            handler.postDelayed(this,1000)
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_yuv)
-        ll_window =findViewById(R.id.ll_window)
-        ll_full_screen = findViewById(R.id.ll_full_screen)
-        myTextureView = MyTextureView(this);
-        var lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT)
-        ll_window.addView(myTextureView,lp)
-        Log.i("syy","oncreate")
+        initView()
+        initPlayer()
+    }
+
+    internal fun initPlayer() {
         nativeOpengl = NativeOpengl()
         myTextureView.setNativeOpengl(nativeOpengl)
+
         nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/03/09/mp4/190309153658147087.mp4");
-        myTextureView.setOnSurfaceListener {
-            WlSurfaceView.OnSurfaceListener {
-                Log.i(
-                    "syy",
-                    "prepareFrom Java"
-                )
+        nativeOpengl.setPreparedListner {
+            Log.i("player", "duration" + nativeOpengl.duration)
+            runOnUiThread {
+                tv_time.text = TimeUtil.getMinute(nativeOpengl.duration)
             }
         }
+        handler.postDelayed(
+            runnable
+        ,1000)
+
+    }
+
+    private fun initView() {
+        ll_window = findViewById(R.id.ll_window)
+        ll_full_screen = findViewById(R.id.ll_full_screen)
+        tv_time = findViewById(R.id.duration)
+        seekbar = findViewById(R.id.seekbar)
+
+        myTextureView = MyTextureView(this);
+        var lp = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.MATCH_PARENT
+        )
+        ll_window.addView(myTextureView, lp)
         myTextureView.setOnClickListener {
             if (isClick) {
                 isClick = false;
@@ -101,17 +139,19 @@ class YuvActivity : AppCompatActivity() {
             }
         }
     }
-
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        }
-
     override fun onDestroy() {
         super.onDestroy()
         nativeOpengl.surfaceDestroy();
 
     }
+
+    fun fullScreen(view: View) {
+        ll_window.removeView(myTextureView)
+        myTextureView.startFullScreen()
+        var lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT)
+        ll_full_screen.addView(myTextureView,lp)
+    }
+
     /**
      * 解析本地yuv 视频
      */
@@ -147,10 +187,4 @@ class YuvActivity : AppCompatActivity() {
         }).start()
     }
 
-    fun fullScreen(view: View) {
-        ll_window.removeView(myTextureView)
-        myTextureView.startFullScreen()
-        var lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT)
-        ll_full_screen.addView(myTextureView,lp)
-    }
 }

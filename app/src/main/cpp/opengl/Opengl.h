@@ -52,6 +52,8 @@ public:
     void resume();
 
     void changeFullScreen(bool fuscreen);
+
+    long getDuration();
 };
 
 

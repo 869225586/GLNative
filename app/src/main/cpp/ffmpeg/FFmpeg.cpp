@@ -76,13 +76,14 @@ void FFmpeg::decodeFFmpegThread() {
             LOGE("解析到音频流");
             //获取到音频
             if (audioPlayer == NULL) {
-                audioPlayer = new AudioPlayer(playStatus, avStream->codecpar->sample_rate);
+                audioPlayer = new AudioPlayer(playStatus,avStream->codecpar->sample_rate,callJava);
                 audioPlayer->streamIndex = i;
                 audioPlayer->codePar = avStream->codecpar;
                 //AV_TIME_BASE 是微妙 1000 000  ，得到几 秒
                 audioPlayer->duration = pFormatCtx->duration / AV_TIME_BASE;
                 audioPlayer->time_base = avStream->time_base;
                 duration = audioPlayer->duration;
+                LOGE("duration---:%d",duration);
             }
         } else if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
             LOGE("解析到视频流");
@@ -171,9 +172,10 @@ void FFmpeg::start() {
                 videoPlayer->avCodecContext->extradata,
                 videoPlayer->avCodecContext->extradata);
     }
+
     audioPlayer->play();
     videoPlayer->play();
-
+    callJava->onCallPrepare();
     LOGD("当前视频的格式 %s", codecName);
     while (playStatus != NULL && !playStatus->exit) {
         if (playStatus->seek) {

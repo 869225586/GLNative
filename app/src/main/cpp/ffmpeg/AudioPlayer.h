@@ -7,6 +7,7 @@
 
 #include "StreamQueue.h"
 #include "PlayStatus.h"
+#include "../calljava/CallJava.h"
 
 extern "C"
 {
@@ -24,7 +25,7 @@ public:
     AVCodecParameters *codePar = NULL;
     StreamQueue *queue = NULL;
     PlayStatus *playStatus = NULL;
-
+    CallJava *callJava = NULL;
     pthread_t thread_play;
     AVPacket *avPacket = NULL;
     AVFrame *avFrame = NULL;
@@ -33,7 +34,7 @@ public:
     int data_size = 0;
     int sample_rate = 0;
 
-    int duration = 0;//总时长
+    long duration = 0;//总时长
     /**
      * typedef struct AVRational{
     int num; ///< Numerator
@@ -69,7 +70,7 @@ public:
     pthread_mutex_t codecMutex;
 
 public:
-    AudioPlayer(PlayStatus *playStatus, int sample_rate);
+    AudioPlayer(PlayStatus *playStatus, int sample_rate,CallJava *callJava);
 
     ~AudioPlayer();
 

@@ -24,6 +24,8 @@ public:
     jmethodID jmid_decodeavpacket;
     jmethodID jmid_callCamera;
     jmethodID jmid_update;
+    jmethodID jmid_callPrepare;
+    jmethodID jmid_callTimeProgress;
 public:
     CallJava(_JavaVM *javaVm,JNIEnv *env,jobject *jobject);
     ~CallJava();
@@ -37,6 +39,10 @@ public:
     void onCallCamera(int cameraTexture);
 
     void onUpdateTexture();
+
+    void onCallPrepare();
+
+    void onCallTimeInfo(double currentPos, long duraiton);
 };
 
 
