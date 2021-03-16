@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.postDelayed
@@ -83,7 +84,6 @@ class PlayerActivity : AppCompatActivity() {
     }
     public var runnable :Runnable = object :Runnable {
         override fun run() {
-            LogUtils.I("---"+nativeOpengl.currentPos)
             var totalduration = nativeOpengl.duration
             var currentpos = nativeOpengl.currentPos
             tv_time.text=TimeUtil.getMinute(currentpos.toLong())+"/"+TimeUtil.getMinute(totalduration)
@@ -108,6 +108,7 @@ class PlayerActivity : AppCompatActivity() {
         nativeOpengl.setPreparedListner {
             Log.i("player", "duration" + nativeOpengl.duration)
             runOnUiThread {
+
                 tv_time.text = TimeUtil.getMinute(nativeOpengl.duration)
             }
         }
@@ -138,6 +139,21 @@ class PlayerActivity : AppCompatActivity() {
                 nativeOpengl.resume()
             }
         }
+        seekbar.setOnSeekBarChangeListener(object: OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                var progress = seekbar.progress;
+                var mills = 100*1.0f/nativeOpengl.duration*progress;
+                nativeOpengl.seek(mills.toLong())
+            }
+
+        })
     }
     override fun onDestroy() {
         super.onDestroy()

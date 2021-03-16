@@ -54,6 +54,8 @@ public:
     void changeFullScreen(bool fuscreen);
 
     long getDuration();
+
+    void seek(long mills);
 };
 
 

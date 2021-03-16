@@ -189,4 +189,8 @@ long Opengl::getDuration() {
     return ffmpeg->duration;
 }
 
+void Opengl::seek(long mis) {
+      ffmpeg->seek(mis);
+}
+
 

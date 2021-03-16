@@ -133,4 +133,8 @@ Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_changewindow(JNIEnv *env, jobje
 JNIEXPORT jlong JNICALL
 Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_getDuration(JNIEnv *env, jobject thiz) {
      return opengl->getDuration();
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_seek(JNIEnv *env, jobject thiz, jlong second) {
+    opengl->seek(second);
 }

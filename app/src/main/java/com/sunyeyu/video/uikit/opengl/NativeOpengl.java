@@ -142,6 +142,6 @@ public class NativeOpengl {
 
     public native long getDuration();
 
-
+    public native void seek(long second);
 
 }
