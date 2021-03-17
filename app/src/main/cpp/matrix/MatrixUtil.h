@@ -84,7 +84,14 @@ static void transMatrix(double x, double y, float *matrix) {
     matrix[3] = x;
     matrix[7] = y;
 }
-
+/**
+ * 缩放
+ * @param left
+ * @param right
+ * @param bottom
+ * @param top
+ * @param matrix
+ */
 static void orthoM(float left, float right, float bottom, float top, float *matrix) {
     matrix[0] = 2 / (right - left);
     matrix[3] = (right + left) / (right - left) * -1;

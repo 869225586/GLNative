@@ -1,5 +1,6 @@
 package com.sunyeyu.video.uikit.anative
 
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
@@ -75,7 +76,6 @@ class PlayerActivity : AppCompatActivity() {
     lateinit var fis: FileInputStream;
     lateinit var nativeOpengl: NativeOpengl
     lateinit var ll_window:LinearLayout //窗口容器
-    lateinit var ll_full_screen:LinearLayout //全屏容器
     lateinit var myTextureView: MyTextureView
     lateinit var tv_time :TextView;
     lateinit var seekbar:SeekBar;
@@ -122,7 +122,6 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun initView() {
         ll_window = findViewById(R.id.ll_window)
-        ll_full_screen = findViewById(R.id.ll_full_screen)
         tv_time = findViewById(R.id.duration)
         seekbar = findViewById(R.id.seekbar)
         mTvMin  = findViewById(R.id.tv_mini)
@@ -167,17 +166,20 @@ class PlayerActivity : AppCompatActivity() {
 
     }
 
+    /**
+     * 开启全屏播放
+     */
     fun fullScreen(view: View) {
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         ll_window.layoutParams.height = RelativeLayout.LayoutParams.MATCH_PARENT;
-        myTextureView.startFullScreen();
-//        ll_window.removeView(myTextureView)
-//        myTextureView.startFullScreen()
-//        var lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT)
-//        ll_full_screen.addView(myTextureView,lp)
     }
 
+    /**
+     * 最小化播放器
+     */
     fun mini(){
-        ll_window.layoutParams.height = 300
+        ll_window.layoutParams.height = 900
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
     /**
      * 解析本地yuv 视频

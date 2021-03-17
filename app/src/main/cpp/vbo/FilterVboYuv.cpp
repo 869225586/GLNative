@@ -161,13 +161,17 @@ void FilFilterVboYuv::destroyData() {
         v = NULL;
     }
 }
-
+/**
+ * 每次 suface 宽高发生变化都会调用这个 函数 来重新计算 适配规则
+ * @param width
+ * @param height
+ */
 void FilFilterVboYuv::setMatrix(int width, int height) {
     initMatrix(matrix);
-    LOGV("change  width %d,height %d",width,height);
+    LOGV("change  width %d,height %d,video_width %d,video_height %d",width,height,yuv_wdith,yuv_height);
     if (yuv_wdith > 0 && yuv_height > 0) {
-        float screen_r = 1.0 * width / height;
-        float picture_r = 1.0 * yuv_wdith / yuv_height;
+        float screen_r = 1.0 * width / height; //计算surface 的宽高比
+        float picture_r = 1.0 * yuv_wdith / yuv_height; //计算视频的宽高比
         if (screen_r > picture_r) //图片宽度缩放
         {
             float r = width / (1.0 * height / yuv_height * yuv_wdith);
@@ -178,6 +182,9 @@ void FilFilterVboYuv::setMatrix(int width, int height) {
         }
     }
     if(fullScreen){
+        //这个全屏的方式 可以不用了（现在直接用activity 旋转就可以做）
+        // 但是也是一种思路。全屏的时候 改变surface 的宽高填充屏幕
+        //需要旋转 画面 才行。
         rotateMatrixZ(90,matrix);
     }
 }
