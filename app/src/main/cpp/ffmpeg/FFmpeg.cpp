@@ -55,6 +55,15 @@ void FFmpeg::decodeFFmpegThread() {
     //防止播放退出还在请求网络 设置了一个回调
     pFormatCtx->interrupt_callback.callback = avformat_callback;
     pFormatCtx->interrupt_callback.opaque = this;
+    /**
+     *  优化起播 速度
+     *  根据实际情况调整这个buffer，通过ffmpeg的AVFormatContext结构体的
+        probesize（设置探测缓冲区大小）
+        和max_analy_duration （设置探测处理时长）
+     */
+
+    pFormatCtx->probesize = 1024 *8;
+    pFormatCtx->max_analyze_duration = 1000 ;
     int result = avformat_open_input(&pFormatCtx, url, NULL, NULL);
     if (result!= 0) {
         LOGE("can not open url : %s,%s,%d", url,"error_code",result)
@@ -209,6 +218,7 @@ void FFmpeg::start() {
                     if (!playStatus->seek) {
                         av_usleep(1000 * 100);
                         playStatus->exit = true;
+                        LOGE("load finish")
                     }
                     break;
                 }
@@ -335,10 +345,10 @@ void FFmpeg::release() {
         LOGE("释放 封装格式上下文");
     }
     LOGE("释放 callJava");
-    /* if(callJava != NULL)
+     if(callJava != NULL)
      {
          callJava = NULL;
-     }*/
+     }
     LOGE("释放 playstatus");
     if (playStatus != NULL) {
         playStatus = NULL;

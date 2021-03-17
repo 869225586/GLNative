@@ -38,13 +38,6 @@
             android:layout_height="wrap_content"/>
     </LinearLayout>
 
-
-    <com.sunyeyu.video.uikit.opengl.MyTextureView
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/textureview"
-        />
     <LinearLayout
         android:layout_below="@+id/ll_seek"
         android:gravity="center_horizontal"
@@ -69,6 +62,15 @@
             android:text="全屏"
             />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_mini"
+        android:text="最小化"
+        android:layout_alignParentRight="true"
+        android:background="#99ffffff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <LinearLayout
         android:visibility="visible"
         android:orientation="vertical"

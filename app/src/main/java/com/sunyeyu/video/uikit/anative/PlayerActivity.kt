@@ -6,6 +6,7 @@ import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
@@ -78,6 +79,7 @@ class PlayerActivity : AppCompatActivity() {
     lateinit var myTextureView: MyTextureView
     lateinit var tv_time :TextView;
     lateinit var seekbar:SeekBar;
+    lateinit var mTvMin : TextView
     var isexit = false
     private var handler :Handler = object : Handler(){
 
@@ -104,7 +106,7 @@ class PlayerActivity : AppCompatActivity() {
         nativeOpengl = NativeOpengl()
         myTextureView.setNativeOpengl(nativeOpengl)
 
-        nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/03/09/mp4/190309153658147087.mp4");
+        nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/03/17/mp4/190317150237409904.mp4");
         nativeOpengl.setPreparedListner {
             Log.i("player", "duration" + nativeOpengl.duration)
             runOnUiThread {
@@ -123,6 +125,7 @@ class PlayerActivity : AppCompatActivity() {
         ll_full_screen = findViewById(R.id.ll_full_screen)
         tv_time = findViewById(R.id.duration)
         seekbar = findViewById(R.id.seekbar)
+        mTvMin  = findViewById(R.id.tv_mini)
 
         myTextureView = MyTextureView(this);
         var lp = LinearLayout.LayoutParams(
@@ -130,6 +133,9 @@ class PlayerActivity : AppCompatActivity() {
             LinearLayout.LayoutParams.MATCH_PARENT
         )
         ll_window.addView(myTextureView, lp)
+        mTvMin.setOnClickListener{
+              mini()
+        }
         myTextureView.setOnClickListener {
             if (isClick) {
                 isClick = false;
@@ -162,12 +168,17 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     fun fullScreen(view: View) {
-        ll_window.removeView(myTextureView)
-        myTextureView.startFullScreen()
-        var lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT)
-        ll_full_screen.addView(myTextureView,lp)
+        ll_window.layoutParams.height = RelativeLayout.LayoutParams.MATCH_PARENT;
+        myTextureView.startFullScreen();
+//        ll_window.removeView(myTextureView)
+//        myTextureView.startFullScreen()
+//        var lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT)
+//        ll_full_screen.addView(myTextureView,lp)
     }
 
+    fun mini(){
+        ll_window.layoutParams.height = 300
+    }
     /**
      * 解析本地yuv 视频
      */

@@ -59,7 +59,6 @@ Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_surfaceDestroy(JNIEnv *env, job
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_changeFilter(JNIEnv *env, jobject thiz) {
-    // TODO: implement changeFilter()
     opengl->onChangeFilter();
 
 }extern "C"

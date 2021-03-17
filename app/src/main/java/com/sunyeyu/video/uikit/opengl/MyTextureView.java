@@ -51,6 +51,7 @@ public class MyTextureView extends TextureView {
 
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                Log.i("hhh","surfaceDestroy");
                 return false;
             }
 
