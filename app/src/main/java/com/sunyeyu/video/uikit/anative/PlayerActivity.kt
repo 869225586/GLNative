@@ -16,10 +16,12 @@ import androidx.core.os.postDelayed
 import com.sunyeyu.video.uikit.opengl.MyTextureView
 import com.sunyeyu.video.uikit.opengl.NativeOpengl
 import com.sunyeyu.video.uikit.opengl.WlSurfaceView
+import com.sunyeyu.video.uikit.util.DnsUitl
 import com.sunyeyu.video.uikit.util.LogUtils
 import com.sunyeyu.video.uikit.util.TimeUtil
 import java.io.File
 import java.io.FileInputStream
+import java.net.InetAddress
 
 /**
  * 驯龙高手 http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4
@@ -103,20 +105,27 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     internal fun initPlayer() {
+//        Thread(){
+//            var iparray= DnsUitl.parseHostGetIPAddress("www.baidu.com")
+//            iparray?.forEach { item->
+//                LogUtils.I("ip $item")
+//            }
+//        }.start()
         nativeOpengl = NativeOpengl()
         myTextureView.setNativeOpengl(nativeOpengl)
 
-        nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/03/17/mp4/190317150237409904.mp4");
+        //直接通过 ip 地址 播放 可减少起播时间
+//        nativeOpengl.playFromFFmpeg("http://128.30.52.156/2010/05/sintel/trailer.mp4");
+        nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/03/09/mp4/190309153658147087.mp4")
         nativeOpengl.setPreparedListner {
             Log.i("player", "duration" + nativeOpengl.duration)
             runOnUiThread {
-
-                tv_time.text = TimeUtil.getMinute(nativeOpengl.duration)
+                handler.postDelayed(
+                    runnable
+                    ,1000)
             }
         }
-        handler.postDelayed(
-            runnable
-        ,1000)
+
 
     }
 

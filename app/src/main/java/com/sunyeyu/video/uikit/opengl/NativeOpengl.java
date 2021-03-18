@@ -109,7 +109,6 @@ public class NativeOpengl {
     }
 
     public void nativeCallTimeProgress(double currentPos,long duration ){
-        LogUtils.Companion.I("currentpos"+currentPos);
         this.pos = currentPos;
     }
 
