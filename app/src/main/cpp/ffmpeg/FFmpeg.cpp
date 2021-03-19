@@ -200,6 +200,8 @@ void FFmpeg::start() {
             if (avPacket->stream_index == audioPlayer->streamIndex) {
                 audioPlayer->queue->putAvpacket(avPacket);
             } else if (avPacket->stream_index == videoPlayer->streamIndex) {
+                //第一次 走到这里 说明首帧出现
+                    LOGE("首帧")
                 videoPlayer->queue->putAvpacket(avPacket);
             } else {
                 av_packet_free(&avPacket);

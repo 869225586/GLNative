@@ -64,6 +64,7 @@ public class NativeOpengl {
             mediaFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, width * height);
             mediaFormat.setByteBuffer("csd-0", ByteBuffer.wrap(csd_0));
             mediaFormat.setByteBuffer("csd-1", ByteBuffer.wrap(csd_1));
+            mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE,40);
             mediaCodec = MediaCodec.createDecoderByType(mime);
 
             info = new MediaCodec.BufferInfo();
@@ -81,7 +82,7 @@ public class NativeOpengl {
 
     public void decodeAVPacket(int datasize, byte[] data) {
         if (surface != null && datasize > 0 && data != null && mediaCodec != null) {
-            int intputBufferIndex = mediaCodec.dequeueInputBuffer(10);
+            int intputBufferIndex = mediaCodec.dequeueInputBuffer(10000);
             if (intputBufferIndex >= 0) {
                 ByteBuffer byteBuffer = mediaCodec.getInputBuffers()[intputBufferIndex];
                 byteBuffer.clear();
