@@ -60,6 +60,7 @@ public class NativeOpengl {
     public void initMediaCodec(String codecName, int width, int height, byte[] csd_0, byte[] csd_1) {
         try {
             String mime = VideoSupportUitl.findVideoCodecName(codecName);
+            LogUtils.Companion.I(mime);
             mediaFormat = MediaFormat.createVideoFormat(mime, width, height);
             mediaFormat.setInteger(MediaFormat.KEY_WIDTH, width);
             mediaFormat.setInteger(MediaFormat.KEY_HEIGHT, height);

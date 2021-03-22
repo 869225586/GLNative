@@ -10,6 +10,9 @@ public class VideoSupportUitl {
     private static Map<String, String> codecMap = new HashMap<>();
     static {
         codecMap.put("h264", "video/avc");
+        codecMap.put("hevc","video/hevc");
+        codecMap.put("mpeg4","video/mp4v-es");
+        codecMap.put("wmv3","video/x-ms-wmv");
     }
 
     public static String findVideoCodecName(String ffcodename)
