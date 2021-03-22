@@ -122,7 +122,7 @@ int AudioPlayer::resampleAudio() {
 }
 
 void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
-//    LOGD("播放声音");
+
     AudioPlayer *wlAudio = (AudioPlayer *) context;
     if (wlAudio != NULL) {
         int buffersize = wlAudio->resampleAudio();
@@ -134,6 +134,7 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
                 LOGD("curPos %f",wlAudio->clock);
                 //回调应用层
                 wlAudio->callJava->onCallTimeInfo(wlAudio->clock, wlAudio->duration);
+                LOGE("audio 回调java ");
             }
             (*wlAudio->pcmBufferQueue)->Enqueue(wlAudio->pcmBufferQueue, (char *) wlAudio->buffer,
                                                 buffersize);
@@ -272,6 +273,13 @@ void AudioPlayer::stop() {
 }
 
 void AudioPlayer::release() {
+    LOGE("开始释放audio player")
+    pause();
+    if(queue!=NULL){
+        queue->notifyQueue();
+    }
+    pthread_join(thread_play,NULL);
+
     if (queue != NULL) {
         delete (queue);
         queue = NULL;
@@ -314,6 +322,7 @@ void AudioPlayer::release() {
     {
         callJava = NULL;
     }
+    LOGE("audio player 释放完毕")
 }
 
 

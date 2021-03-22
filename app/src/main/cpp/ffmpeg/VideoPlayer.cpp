@@ -226,6 +226,11 @@ double VideoPlayer::getDelayTime(double diff) {
 }
 
 void VideoPlayer::release() {
+    LOGE("开始释放video")
+    if(queue!=NULL){
+        queue->notifyQueue();//唤醒队列
+    }
+    pthread_join(thread_play,NULL); //等待线程执行完毕
     if (queue != NULL) {
         delete (queue);
         queue = NULL;
@@ -245,7 +250,7 @@ void VideoPlayer::release() {
     if (playStatus != NULL) {
         playStatus = NULL;
     }
-
+    LOGE("video 释放完毕")
 }
 
 void VideoPlayer::releaseAvpacket(AVPacket *avPacket) {

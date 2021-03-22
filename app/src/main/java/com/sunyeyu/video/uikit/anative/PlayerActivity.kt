@@ -113,11 +113,11 @@ class PlayerActivity : AppCompatActivity() {
 //        }.start()
         nativeOpengl = NativeOpengl()
         myTextureView.setNativeOpengl(nativeOpengl)
-
+        nativeOpengl.playFromFFmpeg("")
         //直接通过 ip 地址 播放 可减少起播时间
+        nativeOpengl.setUrl("http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4")
 //        nativeOpengl.playFromFFmpeg("http://128.30.52.156/2010/05/sintel/trailer.mp4");
-        nativeOpengl.playFromFFmpeg("http://vfx.mtime.cn/Video/2019/03/09/mp4/190309153658147087.mp4")
-        nativeOpengl.setPreparedListner {
+          nativeOpengl.setPreparedListner {
             Log.i("player", "duration" + nativeOpengl.duration)
             runOnUiThread {
                 handler.postDelayed(
@@ -171,7 +171,6 @@ class PlayerActivity : AppCompatActivity() {
     }
     override fun onDestroy() {
         super.onDestroy()
-        nativeOpengl.surfaceDestroy();
 
     }
 
@@ -223,6 +222,14 @@ class PlayerActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         }).start()
+    }
+
+    fun play(view: View) {
+        nativeOpengl.start()
+     }
+    fun stop(view: View) {
+        handler.removeCallbacksAndMessages(null)
+        nativeOpengl.surfaceDestroy()
     }
 
 }

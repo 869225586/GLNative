@@ -59,7 +59,13 @@
     找了很久 发现是在退出destroy 的时候 playstatus 变量没有销毁。 activity退出这个变量下载打开是
     exit 为true 的情况，然后就导致了 avformat_open_input 报错。因为在这个前面为了防止退出的时候 还在网络请求
     我们是加了一个回掉 。 如果exit 为true 就返回  AVERROR_EOF 这是个结束符 所以当avformat_open_input 就会报错
-
+    2 发现退出以后 报 一个jni 的错误
+    signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0xc
+     Cause: null pointer dereference
+     #00 pc 00012a38  /data/app/com.kwai.video.uikit.anative-LHesvBgHlKD1-PZ_OJxrkw==/lib/arm/libnative-lib.so (Opengl::getDuration()+6)
+    这种一般都是某些对象已经释放了。但是你还调用，找了半天才看到 后面那个给提示了。。。
+     (Opengl::getDuration()+6)  这是计时器没停止。还是调用jni 方法 所以抛错了
+     所以native层多加一些非空判断 避免对象释放了。外层还在调用会出问题
     ------------------------------------------------------------
     # C/C++ 笔记#
 

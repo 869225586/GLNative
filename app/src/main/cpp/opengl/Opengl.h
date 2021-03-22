@@ -45,7 +45,11 @@ public:
 
     void setPilex(void *data, int width, int height, int length);
 
-    void preparedFromFFmpeg(PlayStatus *playStatus,CallJava *callJava, const char *url);
+    void preparedFromFFmpeg(PlayStatus *playStatus,CallJava *callJava);
+
+    void setUrl(const char *url);
+
+    void start();
 
     void pause();
 

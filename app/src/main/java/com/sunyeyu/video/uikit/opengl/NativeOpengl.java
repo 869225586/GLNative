@@ -61,7 +61,9 @@ public class NativeOpengl {
         try {
             String mime = VideoSupportUitl.findVideoCodecName(codecName);
             mediaFormat = MediaFormat.createVideoFormat(mime, width, height);
-            mediaFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, width * height);
+            mediaFormat.setInteger(MediaFormat.KEY_WIDTH, width);
+            mediaFormat.setInteger(MediaFormat.KEY_HEIGHT, height);
+            mediaFormat.setLong(MediaFormat.KEY_MAX_INPUT_SIZE, width * height);
             mediaFormat.setByteBuffer("csd-0", ByteBuffer.wrap(csd_0));
             mediaFormat.setByteBuffer("csd-1", ByteBuffer.wrap(csd_1));
             mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE,40);
@@ -82,7 +84,7 @@ public class NativeOpengl {
 
     public void decodeAVPacket(int datasize, byte[] data) {
         if (surface != null && datasize > 0 && data != null && mediaCodec != null) {
-            int intputBufferIndex = mediaCodec.dequeueInputBuffer(10000);
+            int intputBufferIndex = mediaCodec.dequeueInputBuffer(10);
             if (intputBufferIndex >= 0) {
                 ByteBuffer byteBuffer = mediaCodec.getInputBuffers()[intputBufferIndex];
                 byteBuffer.clear();
@@ -144,4 +146,7 @@ public class NativeOpengl {
 
     public native void seek(long second);
 
+    public native void setUrl(String url);
+
+    public native void start();
 }

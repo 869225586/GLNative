@@ -47,13 +47,16 @@
         <Button
             android:text="播放"
             android:textColor="#000"
+            android:onClick="play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
         <Button
             android:textColor="#000"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="暂停"
+            android:text="停止"
+            android:onClick="stop"
             />
         <Button
             android:onClick="fullScreen"

@@ -46,7 +46,7 @@ void *eglThreadImpl(void *context) {
             if (eglThread->isStart) {
                 eglThread->draw(eglThread->onDrawCtx);
                 eglHelper->swapBuffers();
-                LOGD("draw");
+                LOGV("draw");
             }
             //// 区分自动刷新和手动刷新
             if (eglThread->renderType == RENDER_AUTO) {

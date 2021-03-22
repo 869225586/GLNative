@@ -4,8 +4,7 @@
 
 #include "FFmpeg.h"
 
-FFmpeg::FFmpeg(PlayStatus *playStatus, CallJava *callJava, const char *url) {
-    this->url = url;
+FFmpeg::FFmpeg(PlayStatus *playStatus, CallJava *callJava) {
     this->playStatus = playStatus;
     this->callJava = callJava;
     exit = false;
@@ -168,9 +167,10 @@ void FFmpeg::start() {
         videoPlayer->abs_ctx->time_base_in = videoPlayer->time_base;
     }
     end:
-    surpportMediaCodec=false;//TODO 硬解现在还有点问题
+    surpportMediaCodec=true;//TODO 硬解现在还有点问题
     if (surpportMediaCodec) {
         videoPlayer->codecType = CODEC_MEDIACODEC;
+        LOGE("video width :%d,video height:%d",videoPlayer->avCodecContext->width,videoPlayer->avCodecContext->height);
         videoPlayer->callJava->
                 onCallInitMediacodec(
                 codecName,
@@ -201,7 +201,7 @@ void FFmpeg::start() {
                 audioPlayer->queue->putAvpacket(avPacket);
             } else if (avPacket->stream_index == videoPlayer->streamIndex) {
                 //第一次 走到这里 说明首帧出现
-                    LOGE("首帧")
+                    LOGV("解析")
                 videoPlayer->queue->putAvpacket(avPacket);
             } else {
                 av_packet_free(&avPacket);
@@ -357,5 +357,9 @@ void FFmpeg::release() {
     }
 
     pthread_mutex_unlock(&init_mutex);
+}
+
+void FFmpeg::setUrl(const char *url) {
+    this->url = url;
 }
 

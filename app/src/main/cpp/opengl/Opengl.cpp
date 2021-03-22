@@ -19,10 +19,10 @@ void callback_SurfaceCrete(void *ctx) {
         }
     }
     LOGD("toPlay");
-    if(wlOpengl->ffmpeg!=NULL){
-        wlOpengl->ffmpeg->preapared();
-        wlOpengl->ffmpeg->videoPlayer->setCallYUV(callback_yuv, wlOpengl);
-    }
+//    if(wlOpengl->ffmpeg!=NULL){
+//        wlOpengl->ffmpeg->preapared();
+//        wlOpengl->ffmpeg->videoPlayer->setCallYUV(callback_yuv, wlOpengl);
+//    }
 }
 
 void callback_SurfacChange(int width, int height, void *ctx) {
@@ -103,6 +103,7 @@ void Opengl::onDestorySurface() {
     if (wlEglThread != NULL) {
         wlEglThread->destroy();
     }
+
     if (baseRender != NULL) {
         baseRender->destroyData();
         delete baseRender;
@@ -155,8 +156,8 @@ void Opengl::setYuvData(void *y, void *u, void *v, int w, int h) {
     }
 }
 
-void Opengl::preparedFromFFmpeg(PlayStatus *playStatus, CallJava *callJava, const char *url) {
-    ffmpeg = new FFmpeg(playStatus, callJava, url);
+void Opengl::preparedFromFFmpeg(PlayStatus *playStatus, CallJava *callJava) {
+    ffmpeg = new FFmpeg(playStatus, callJava);
     LOGD("ffmpegPrepare");
 }
 
@@ -190,7 +191,22 @@ long Opengl::getDuration() {
 }
 
 void Opengl::seek(long mis) {
-      ffmpeg->seek(mis);
+    if(ffmpeg!=NULL){
+        ffmpeg->seek(mis);
+    }
+}
+
+void Opengl::setUrl(const char *url) {
+     if(ffmpeg!=NULL){
+         ffmpeg->setUrl(url);
+     }
+}
+
+void Opengl::start() {
+    if(ffmpeg!=NULL){
+        ffmpeg->videoPlayer->setCallYUV(callback_yuv, this);
+        ffmpeg->preapared();
+    }
 }
 
 

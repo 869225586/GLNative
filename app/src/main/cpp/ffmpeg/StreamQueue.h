@@ -30,6 +30,7 @@ public:
 
     int getQueueSize();
     void clearQueue();
+    int notifyQueue();
 
 };
 

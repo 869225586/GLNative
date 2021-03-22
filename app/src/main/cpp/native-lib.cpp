@@ -106,7 +106,7 @@ Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_playFromFFmpeg(JNIEnv *env, job
         opengl = new Opengl(callJava);
     }
     const char *source = env->GetStringUTFChars(url, 0);
-    opengl->preparedFromFFmpeg(playStatus, callJava, source);
+    opengl->preparedFromFFmpeg(playStatus, callJava);
 }
 
 extern "C"
@@ -127,13 +127,33 @@ Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_resume(JNIEnv *env, jobject thi
 JNIEXPORT void JNICALL
 Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_changewindow(JNIEnv *env, jobject thiz,
                                                               jboolean fullscreen) {
-     opengl->changeFullScreen(fullscreen);
+    if(opengl!=NULL){
+        opengl->changeFullScreen(fullscreen);
+    }
 }extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_getDuration(JNIEnv *env, jobject thiz) {
-     return opengl->getDuration();
+    if(opengl!=NULL){
+        return opengl->getDuration();
+    }
+    return 0;
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_seek(JNIEnv *env, jobject thiz, jlong second) {
-    opengl->seek(second);
+    if(opengl!=NULL){
+        opengl->seek(second);
+    }
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_setUrl(JNIEnv *env, jobject thiz, jstring url) {
+    if(opengl!=NULL){
+        const char *source = env->GetStringUTFChars(url, 0);
+        opengl->setUrl(source);
+    }
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_start(JNIEnv *env, jobject thiz) {
+    if(opengl!=NULL){
+        opengl->start();
+    }
 }

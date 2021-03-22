@@ -39,13 +39,15 @@ public:
 
     bool isCreateVideo = false;
 public:
-    FFmpeg(PlayStatus *playStatus,CallJava *callJava, const char *url);
+    FFmpeg(PlayStatus *playStatus,CallJava *callJava);
 
     ~FFmpeg();
 
     void preapared();
 
     void decodeFFmpegThread();
+
+    void setUrl(const char* url);
 
     void start();
 

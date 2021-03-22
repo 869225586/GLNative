@@ -68,3 +68,8 @@ void StreamQueue::clearQueue() {
     }
     pthread_mutex_unlock(&mutexQueue);
 }
+
+int StreamQueue::notifyQueue() {
+    pthread_cond_signal(&condQueue);
+    return 0;
+}
