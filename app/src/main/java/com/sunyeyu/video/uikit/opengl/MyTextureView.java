@@ -32,10 +32,11 @@ public class MyTextureView extends TextureView {
     private void init() {
         setSurfaceTextureListener(new SurfaceTextureListener() {
             @Override
-            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                msurface = new Surface(surface);
+            public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
+                msurface = new Surface(surfaceTexture);
                 if(nativeOpengl != null)
                 {
+                    nativeOpengl.setSurfaceTexture(surfaceTexture);
                     nativeOpengl.setSurface(msurface);
                     if(onSurfaceListener!=null)
                         onSurfaceListener.init();

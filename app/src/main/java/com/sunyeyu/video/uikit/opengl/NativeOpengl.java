@@ -1,5 +1,6 @@
 package com.sunyeyu.video.uikit.opengl;
 
+import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.util.Log;
@@ -11,12 +12,15 @@ import java.nio.ByteBuffer;
 
 public class NativeOpengl {
     Surface surface;
+    Surface mediaCodecSurface;//mediacodec硬解
     OnCameraTextureCall onCameraTextureCall;
     onPreparedListner preparedListner;
     private double pos ;
     static {
         System.loadLibrary("native-lib");
     }
+
+    private SurfaceTexture mediaCodeSurfaceTexture;
 
     public interface OnCameraTextureCall {
         void callTextTure(int textureId);
@@ -29,11 +33,15 @@ public class NativeOpengl {
 
 
     public void initSurfaceTextture(int cameraTextureId) {
+//        mediaCodeSurfaceTexture.attachToGLContext(cameraTextureId);
+        mediaCodeSurfaceTexture = new SurfaceTexture(cameraTextureId);
+        mediaCodecSurface = new Surface(mediaCodeSurfaceTexture);
         if (onCameraTextureCall != null) {
             onCameraTextureCall.callTextTure(cameraTextureId);
         }
     }
     public void updateSurfaceTextture() {
+        mediaCodeSurfaceTexture.updateTexImage();
         if (onCameraTextureCall != null) {
             onCameraTextureCall.update();
         }
@@ -71,7 +79,7 @@ public class NativeOpengl {
             mediaCodec = MediaCodec.createDecoderByType(mime);
 
             info = new MediaCodec.BufferInfo();
-            mediaCodec.configure(mediaFormat, surface, null, 0);
+            mediaCodec.configure(mediaFormat, mediaCodecSurface, null, 0);
             mediaCodec.start();
         } catch (Exception e) {
             e.printStackTrace();
@@ -84,7 +92,7 @@ public class NativeOpengl {
     }
 
     public void decodeAVPacket(int datasize, byte[] data) {
-        if (surface != null && datasize > 0 && data != null && mediaCodec != null) {
+        if (mediaCodecSurface != null && datasize > 0 && data != null && mediaCodec != null) {
             int intputBufferIndex = mediaCodec.dequeueInputBuffer(10);
             if (intputBufferIndex >= 0) {
                 ByteBuffer byteBuffer = mediaCodec.getInputBuffers()[intputBufferIndex];
@@ -92,6 +100,7 @@ public class NativeOpengl {
                 byteBuffer.put(data);
                 mediaCodec.queueInputBuffer(intputBufferIndex, 0, datasize, 0, 0);
             }
+            LogUtils.Companion.I("硬解吗");
             int outputBufferIndex = mediaCodec.dequeueOutputBuffer(info, 10);
             while (outputBufferIndex >= 0) {
                 mediaCodec.releaseOutputBuffer(outputBufferIndex, true);
@@ -106,6 +115,9 @@ public class NativeOpengl {
         surfaceCreate(surface);
     }
 
+    public void setSurfaceTexture(SurfaceTexture surfaceTexture){
+        mediaCodeSurfaceTexture = surfaceTexture;
+    }
     public void callPrepared(){
         if(preparedListner!=null){
             preparedListner.onPrepared();

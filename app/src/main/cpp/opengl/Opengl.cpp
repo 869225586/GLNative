@@ -4,6 +4,8 @@
 
 #include "Opengl.h"
 #include "../vbo/CameraRender.h"
+#include "../vbo/MediaCodecRender.h"
+
 
 void callback_yuv(void *y, void *u, void *v, int width, int height, void *ctx) {
     Opengl *opengl = static_cast<Opengl *>(ctx);
@@ -86,7 +88,7 @@ void Opengl::onCreateSurface(JNIEnv *env, jobject surface) {
     wlEglThread->setDestroyCallBack(callback_SurfaceDestroy, this);
 
     wlEglThread->onSurfaceCreate(nativeWindow);
-    LOGD("surfaceCreate");
+    LOGD("surfaceCreate ");
 }
 
 void Opengl::onChangeSurface(int width, int height) {
@@ -163,8 +165,9 @@ void Opengl::preparedFromFFmpeg(PlayStatus *playStatus, CallJava *callJava) {
 
 Opengl::Opengl(CallJava *callJava) {
     LOGD("initOpenGl");
-    baseRender = new FilFilterVboYuv();
+//    baseRender = new FilFilterVboYuv();
 //    baseRender = new CameraRender(callJava);
+     baseRender = new MediaCodecRender(callJava);
 }
 
 void Opengl::pause() {

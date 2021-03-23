@@ -1,6 +1,7 @@
 package com.sunyeyu.video.uikit.opengl;
 
 import android.content.Context;
+import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;

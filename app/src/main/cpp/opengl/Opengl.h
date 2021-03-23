@@ -13,6 +13,7 @@
 #include "../filter/FilterYuv.h"
 #include "../vbo/FilterVboYuv.h"
 #include "../vbo/CameraRender.h"
+#include "../vbo/MediaCodecRender.h"
 
 #include "../ffmpeg/FFmpeg.h"
 class Opengl {
