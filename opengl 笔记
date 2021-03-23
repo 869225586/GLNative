@@ -53,6 +53,19 @@
     #define AVERROR_PROTOCOL_NOT_FOUND = -1330794744 FFERRTAG(0xF8,'P','R','O') ///< Protocol not found
     #define AVERROR_STREAM_NOT_FOUND = -1381258232  FFERRTAG(0xF8,'S','T','R') ///< Stream not found
 
+    MediaCodec 硬解 流程
+    1 初始化egl 环境。这些就不说了。egl 环境需要一个surface
+    2 然后还有加载对应的硬解shader 创建一个纹理 通过这个纹理。我们创建一个
+    surfaceTexture ，然后 再创建一个surface 。然后传给 mediacodec
+    初始化mediacodec  start（）
+    3 然后ffmpeg 解码得到avpacket 传递 给mediacodec 进行硬解码
+    4 我们硬解码的数据是更新到这个surfac上的。
+    5 那么如何渲染到我们第一个surface 上。我猜测是通过创建的纹理。这个纹理
+    上有硬解得到的yuv 数据。再渲染到我们的 第一个surface上
+
+    事实证明是对的。（一开始 传给 mediacodec 的是 第一个surface 。这个surface 没有
+    纹理id所以在的一直报错。网上找了好久的答案？）
+
     错误记录总结：
     1 发现在退出activity 以后会 再次打开 avformat_open_input 会报错 （destroy 变量一定要销毁干净）。
     AVERROR_EXIT 返回这个错误 。这是退出的错误。 但是杀死进程再次打开就没有问题
