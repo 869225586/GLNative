@@ -160,6 +160,8 @@ void Opengl::setYuvData(void *y, void *u, void *v, int w, int h) {
 
 void Opengl::preparedFromFFmpeg(PlayStatus *playStatus, CallJava *callJava) {
     ffmpeg = new FFmpeg(playStatus, callJava);
+    ffmpeg->videoPlayer->setCallYUV(callback_yuv, this);
+    ffmpeg->preapared();
     LOGD("ffmpegPrepare");
 }
 
@@ -207,8 +209,7 @@ void Opengl::setUrl(const char *url) {
 
 void Opengl::start() {
     if(ffmpeg!=NULL){
-        ffmpeg->videoPlayer->setCallYUV(callback_yuv, this);
-        ffmpeg->preapared();
+      ffmpeg->start();
     }
 }
 

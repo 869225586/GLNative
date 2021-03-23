@@ -225,7 +225,13 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     fun play(view: View) {
-        nativeOpengl.start()
+        object :Thread(){
+            override fun run() {
+                super.run()
+                nativeOpengl.start()
+            }
+        }.start()
+
      }
     fun stop(view: View) {
         handler.removeCallbacksAndMessages(null)

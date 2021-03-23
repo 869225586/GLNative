@@ -122,19 +122,6 @@ void FFmpeg::decodeFFmpegThread() {
     if (videoPlayer != NULL) {
         getCodecContext(videoPlayer->codecpar, &videoPlayer->avCodecContext);
     }
-    start();
-    pthread_mutex_unlock(&init_mutex);
-
-}
-
-void FFmpeg::start() {
-//    LOGD("播放%p",audioPlayer);
-    if (audioPlayer == NULL) {
-        return;
-    }
-    if (videoPlayer == NULL) {
-        return;
-    }
     surpportMediaCodec = false;
     videoPlayer->audioPlayer = audioPlayer;
     const char *codecName = ((const AVCodec *) videoPlayer->avCodecContext->codec)->name;
@@ -181,11 +168,24 @@ void FFmpeg::start() {
                 videoPlayer->avCodecContext->extradata,
                 videoPlayer->avCodecContext->extradata);
     }
+    callJava->onCallPrepare();
+    LOGE("准备完毕 ,当前视频的格式 %s", codecName);
+    pthread_mutex_unlock(&init_mutex);
+
+}
+
+void FFmpeg::start() {
+//    LOGD("播放%p",audioPlayer);
+    if (audioPlayer == NULL) {
+        return;
+    }
+    if (videoPlayer == NULL) {
+        return;
+    }
 
     audioPlayer->play();
     videoPlayer->play();
-    callJava->onCallPrepare();
-    LOGD("当前视频的格式 %s", codecName);
+
     while (playStatus != NULL && !playStatus->exit) {
         if (playStatus->seek) {
             av_usleep(1000 * 100);
