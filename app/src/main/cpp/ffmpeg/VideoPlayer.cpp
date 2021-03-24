@@ -65,7 +65,15 @@ void *playVideo(void *data) {
 
                     av_usleep(videoPlayer->getDelayTime(diff) * 1000000);
                     videoPlayer->callJava->onCallDecodeAVPacket(avPacket->size, avPacket->data);
-
+                    if (videoPlayer->callYuv != NULL) {
+                        videoPlayer->callYuv(0,
+                                             0,
+                                             0,
+                                             videoPlayer->avCodecContext->width,//这里没有用avcodecContext 的width 因为
+                                //avcodeccontext 获取到的宽与实际不一致 导致了画面都抽象了。。
+                                             videoPlayer->avCodecContext->height,
+                                             videoPlayer->ctx);
+                    }
                     av_packet_free(&avPacket);
                     av_free(avPacket);
                     continue;

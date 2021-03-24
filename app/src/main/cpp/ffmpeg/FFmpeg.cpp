@@ -175,7 +175,7 @@ void FFmpeg::decodeFFmpegThread() {
 }
 
 void FFmpeg::start() {
-//    LOGD("播放%p",audioPlayer);
+    LOGE("开始播放");
     if (audioPlayer == NULL) {
         return;
     }

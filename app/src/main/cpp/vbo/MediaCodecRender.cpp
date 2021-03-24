@@ -116,12 +116,31 @@ void MediaCodecRender::destroyData() {
 
 void MediaCodecRender::setMatrix(int width, int height) {
     initMatrix(matrix);
+    if (yuv_wdith > 0 && yuv_height > 0) {
+        float screen_r = 1.0 * width / height; //计算surface 的宽高比
+        float picture_r = 1.0 * yuv_wdith / yuv_height; //计算视频的宽高比
+        if (screen_r > picture_r) //图片宽度缩放
+        {
+            float r = width / (1.0 * height / yuv_height * yuv_wdith);
+            orthoM(-r, r, -1, 1, matrix);
+        } else {//图片高度缩放
+            float r = height / (1.0 * width / yuv_wdith * yuv_height);
+            orthoM(-1, 1, -r, r, matrix);
+        }
+    }
     //相机 旋转 怎么算的瞎蒙的
 //    rotateMatrixZ(-90, matrix);
 //    rotateMatrixX(90, matrix);
 }
 
 void MediaCodecRender::setYuvData(void *y, void *u, void *v, int width, int height) {
+    if (width > 0 && height > 0) {
+        if (yuv_wdith != width || yuv_height != height) {
+            yuv_wdith = width;
+            yuv_height = height;
+            setMatrix(surface_width, surface_height);
+        }
+    }
 }
 
 

@@ -86,6 +86,11 @@ class PlayerActivity : AppCompatActivity() {
     private var handler :Handler = object : Handler(){
 
     }
+    var thread:Thread= object :Thread(){
+        override fun run() {
+            nativeOpengl.start()
+        }
+    }
     public var runnable :Runnable = object :Runnable {
         override fun run() {
             var totalduration = nativeOpengl.duration
@@ -118,12 +123,9 @@ class PlayerActivity : AppCompatActivity() {
         nativeOpengl.setUrl("http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4")
 //        nativeOpengl.playFromFFmpeg("http://128.30.52.156/2010/05/sintel/trailer.mp4");
           nativeOpengl.setPreparedListner {
-            Log.i("player", "duration" + nativeOpengl.duration)
-            runOnUiThread {
-                handler.postDelayed(
-                    runnable
-                    ,1000)
-            }
+            Log.i("syy", "duration" + nativeOpengl.duration)
+//                handler.post(
+//                    runnable)
         }
 
 
@@ -153,6 +155,7 @@ class PlayerActivity : AppCompatActivity() {
                 nativeOpengl.resume()
             }
         }
+
         seekbar.setOnSeekBarChangeListener(object: OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
@@ -225,16 +228,10 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     fun play(view: View) {
-        object :Thread(){
-            override fun run() {
-                super.run()
-                nativeOpengl.start()
-            }
-        }.start()
-
+        thread.start()
      }
     fun stop(view: View) {
-        handler.removeCallbacksAndMessages(null)
+//        handler.removeCallbacksAndMessages(null)
         nativeOpengl.surfaceDestroy()
     }
 

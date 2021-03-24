@@ -80,7 +80,7 @@ void callback_SurfaceDestroy(void *ctx) {
 void Opengl::onCreateSurface(JNIEnv *env, jobject surface) {
     nativeWindow = ANativeWindow_fromSurface(env, surface);
     wlEglThread = new EglThread();
-    wlEglThread->setRenderType(RENDER_AUTO);
+    wlEglThread->setRenderType(RENDER_HADNLE);
     wlEglThread->setCreateCallBack(callback_SurfaceCrete, this);
     wlEglThread->setChangeCallBack(callback_SurfacChange, this);
     wlEglThread->setDrawCallBack(callback_SurfaceDraw, this);

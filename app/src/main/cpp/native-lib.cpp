@@ -55,6 +55,8 @@ Java_com_sunyeyu_video_uikit_opengl_NativeOpengl_surfaceDestroy(JNIEnv *env, job
     delete playStatus;
     playStatus = NULL;
 
+    delete callJava;
+    callJava = NULL;
 
 }extern "C"
 JNIEXPORT void JNICALL

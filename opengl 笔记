@@ -11,11 +11,10 @@
 
    如果沿着 x旋转 图片是前后翻转的 。
 
-
    整体流程
 
    1surface 生命周期 回调 jni 的OpengL
-   2 Opengl.cpp 中
+   2Opengl.cpp 中
     onsurfaceCreate   创建egl 线程 初始化egl 环境 设置 egl 中 回调方法 create  change draw    在
     opengl.cpp 中定义回调方法  ，回调方法中 调用 对应render 的几个方法   。也就是FilterOne
     filterOne 中 在对应方法 中进行 opengl 的 shader 加载 等等
@@ -24,7 +23,7 @@
 
     -----------------------------------------------------------
     FFMpeg 笔记
-    pts dts time_base  博客
+    1 pts dts time_base  博客
     https://www.cnblogs.com/ZY-Dream/p/10245464.html
     得出的结论为 pts 是告诉什么时间显示这帧 数据 但是pts 单位并不是多少秒。
     我们视频会把自己分成很多刻度 类似于一个尺子 每一个视频帧都对应自己的刻度 。pts的值就是占多少个时间刻度
@@ -32,39 +31,26 @@
     就需要time_base  time_base 是每个刻度多少秒。 比如一个视频是25 帧 那么 每一帧就是1/25 秒
     那么我们计算 某一帧 是第几秒 就需要pts *time_base;
 
-    yuv 420 p 是视频裸数据  不是我们普通意义上的mp4 等等 视频格式 h264 h265 是一种压缩算法 mp4 是一种视频的封装格式
+    2 yuv 420 p 是视频裸数据  不是我们普通意义上的mp4 等等 视频格式 h264 h265 是一种压缩算法 mp4 是一种视频的封装格式
+    3 MediaCodec 硬解 流程
+        1 初始化egl 环境。这些就不说了。egl 环境需要一个surface
+        2 然后还有加载对应的硬解shader 创建一个纹理 通过这个纹理。我们创建一个
+        surfaceTexture ，然后 再创建一个surface 。然后传给 mediacodec
+        初始化mediacodec  start（）
+        3 然后ffmpeg 解码得到avpacket 传递 给mediacodec 进行硬解码
+        4 我们硬解码的数据是更新到这个surfac上的。
+        5 那么如何渲染到我们第一个surface 上。我猜测是通过创建的纹理。这个纹理
+        上有硬解得到的yuv 数据。再渲染到我们的 第一个surface上
 
-    avformat_open_input / 返回的错误码及解释
-
-    #define AVERROR_BSF_NOT_FOUND  =  -1179861752    FFERRTAG(0xF8,'B','S','F') ///< Bitstream filter not found
-    #define AVERROR_BUG = -558323010                FFERRTAG( 'B','U','G','!') ///< Internal bug, also see AVERROR_BUG2
-    #define AVERROR_BUFFER_TOO_SMALL   FFERRTAG( 'B','U','F','S') ///< Buffer too small
-    #define AVERROR_DECODER_NOT_FOUND = -1128613112  FFERRTAG(0xF8,'D','E','C') ///< Decoder not found
-    #define AVERROR_DEMUXER_NOT_FOUND = -1296385272 FFERRTAG(0xF8,'D','E','M') ///< Demuxer not found
-    #define AVERROR_ENCODER_NOT_FOUND = -1129203192 FFERRTAG(0xF8,'E','N','C') ///< Encoder not found
-    #define AVERROR_EOF   = -541478725             FFERRTAG( 'E','O','F',' ') ///< End of file
-    #define AVERROR_EXIT  = -1414092869             FFERRTAG( 'E','X','I','T') ///< Immediate exit was requested; the called function should not be restarted
-    #define AVERROR_EXTERNAL           FFERRTAG( 'E','X','T',' ') ///< Generic error in an external library
-    #define AVERROR_FILTER_NOT_FOUND = -1279870712  FFERRTAG(0xF8,'F','I','L') ///< Filter not found
-    #define AVERROR_INVALIDDATA  = -1094995529      FFERRTAG( 'I','N','D','A') ///< Invalid data found when processing input
-    #define AVERROR_MUXER_NOT_FOUND = -1481985528   FFERRTAG(0xF8,'M','U','X') ///< Muxer not found
-    #define AVERROR_OPTION_NOT_FOUND = -1414549496  FFERRTAG(0xF8,'O','P','T') ///< Option not found
-    #define AVERROR_PATCHWELCOME   = -1163346256    FFERRTAG( 'P','A','W','E') ///< Not yet implemented in FFmpeg, patches welcome
-    #define AVERROR_PROTOCOL_NOT_FOUND = -1330794744 FFERRTAG(0xF8,'P','R','O') ///< Protocol not found
-    #define AVERROR_STREAM_NOT_FOUND = -1381258232  FFERRTAG(0xF8,'S','T','R') ///< Stream not found
-
-    MediaCodec 硬解 流程
-    1 初始化egl 环境。这些就不说了。egl 环境需要一个surface
-    2 然后还有加载对应的硬解shader 创建一个纹理 通过这个纹理。我们创建一个
-    surfaceTexture ，然后 再创建一个surface 。然后传给 mediacodec
-    初始化mediacodec  start（）
-    3 然后ffmpeg 解码得到avpacket 传递 给mediacodec 进行硬解码
-    4 我们硬解码的数据是更新到这个surfac上的。
-    5 那么如何渲染到我们第一个surface 上。我猜测是通过创建的纹理。这个纹理
-    上有硬解得到的yuv 数据。再渲染到我们的 第一个surface上
-
-    事实证明是对的。（一开始 传给 mediacodec 的是 第一个surface 。这个surface 没有
-    纹理id所以在的一直报错。网上找了好久的答案？）
+        事实证明是对的。（一开始 传给 mediacodec 的是 第一个surface 。这个surface 没有
+        纹理id所以在的一直报错。网上找了好久的答案？）
+    4 glViewport 的作用 ?
+     glViewport(0(x), 0(y), width(surfaceW), height(surfaceH));
+     X，Y—以像素为单位，指定了视口的左下角（在第一象限内，以（0，0）为原点的）位置。
+     width，height————表示这个视口矩形的宽度和高度，根据窗口的实时变化重绘窗口
+     视口变换也就是glViewport()做的工作，它是把OpenGL的标准化设备坐标转换为屏幕空间坐标，而OpenGL的标准化设备坐标是(-1,1)，
+     视口变换需要将该坐标变换到glViewport()参数指定的坐标范围内
+     ------------------------------------------------------------
 
     错误记录总结：
     1 发现在退出activity 以后会 再次打开 avformat_open_input 会报错 （destroy 变量一定要销毁干净）。
@@ -87,60 +73,28 @@
      头文件 开始都有个这个宏定义，如果这个还是用的被拷贝的那个文件的宏，那么
      你复制出来的文件 等于没有创建 所以是找不到的。你要把这个东西改名
 
-    ------------------------------------------------------------
-    # C/C++ 笔记#
 
-   （1）指针:
-    一个字节 = 8 bit  （1 byte = 8 bit ）8bit 01 01 01 01
-    int i = 100;
-    int* p = &i;
 
-    int y = 200;
-    int* p1 = &y;
 
-    p=p1; //这里把 p1 赋值给 p  并不是把 y的地址赋值给了 i 因为 p 是一个指针变量
-    它一开始是 i的地址的值。。 这里交换以后 p就变成了y的地址的值。而i的地址从来都没有变过
+    avformat_open_input / 返回的错误码及解释
 
-    *p = *p1; //这里赋值其实就没有意义了。因为 *p已经指向了 y的值也就是200
+    #define AVERROR_BSF_NOT_FOUND  =  -1179861752    FFERRTAG(0xF8,'B','S','F') ///< Bitstream filter not found
+    #define AVERROR_BUG = -558323010                FFERRTAG( 'B','U','G','!') ///< Internal bug, also see AVERROR_BUG2
+    #define AVERROR_BUFFER_TOO_SMALL   FFERRTAG( 'B','U','F','S') ///< Buffer too small
+    #define AVERROR_DECODER_NOT_FOUND = -1128613112  FFERRTAG(0xF8,'D','E','C') ///< Decoder not found
+    #define AVERROR_DEMUXER_NOT_FOUND = -1296385272 FFERRTAG(0xF8,'D','E','M') ///< Demuxer not found
+    #define AVERROR_ENCODER_NOT_FOUND = -1129203192 FFERRTAG(0xF8,'E','N','C') ///< Encoder not found
+    #define AVERROR_EOF   = -541478725             FFERRTAG( 'E','O','F',' ') ///< End of file
+    #define AVERROR_EXIT  = -1414092869             FFERRTAG( 'E','X','I','T') ///< Immediate exit was requested; the called function should not be restarted
+    #define AVERROR_EXTERNAL           FFERRTAG( 'E','X','T',' ') ///< Generic error in an external library
+    #define AVERROR_FILTER_NOT_FOUND = -1279870712  FFERRTAG(0xF8,'F','I','L') ///< Filter not found
+    #define AVERROR_INVALIDDATA  = -1094995529      FFERRTAG( 'I','N','D','A') ///< Invalid data found when processing input
+    #define AVERROR_MUXER_NOT_FOUND = -1481985528   FFERRTAG(0xF8,'M','U','X') ///< Muxer not found
+    #define AVERROR_OPTION_NOT_FOUND = -1414549496  FFERRTAG(0xF8,'O','P','T') ///< Option not found
+    #define AVERROR_PATCHWELCOME   = -1163346256    FFERRTAG( 'P','A','W','E') ///< Not yet implemented in FFmpeg, patches welcome
+    #define AVERROR_PROTOCOL_NOT_FOUND = -1330794744 FFERRTAG(0xF8,'P','R','O') ///< Protocol not found
+    #define AVERROR_STREAM_NOT_FOUND = -1381258232  FFERRTAG(0xF8,'S','T','R') ///< Stream not found
 
-   （2）二级指针:
-    int** p2 = &p;    //p2代表  p的地址的值  ,  *p2 表示 p的地址存储的东西 也就是i 的地址的值
 
-    *P 代表 从某个地址取 它存储的东西。
-
-   （3）静态内存与动态内存:
-    栈内存 ： 静态内存开辟 方法结束 自动回收 ,例如 int arr[1024]
-    堆内存 ： 动态内存开辟 需要手动回收  例如malloc  释放 free
-    注意的点
-
-    realloc 是对已经malloc 的扩展增加申请，
-    如果内存不足就会返回NULL
-    如果内存足够  当前malloc 返回的内存地址 如果可以进行扩展那么 返回的就是原来的指针
-    否则 会 找一块别的内存区域 将原来的复制过来 再扩展  这时 返回的指针 已经不是原来的指针了
-
-    (4)数组 ：
-    数组的首个元素的地址就是整个数组的地址
-    int arr[] ={1,3,4};
-    arr 即为数组的地址  可以用 指针 表示 int* arr_p=arr;
-    也可以写成 int* arr_p = &arr[0] (第零个元素的地址)
-
-    (5)字符串的定义:
-    char str[]={'a','b','c','\0'}; //这种形式声明字符串 必须以\0 结尾 才知道字符串结束
-    char *c_str="abc";
-    其实第二种就是 用char * 指代一个char 数组 与 int 数组类似 但是第二种无法修改元素
-    想操作字符串进行拼接 拷贝等， 必须使用 char  数组形式进行 。
-
-    (6)结构体字节计算规则:
-    struct Woker{
-     int age 4
-     double  8
-     char name[10]  （char 一个字节） 10
-    }
-    1 按照最大字节计算 如上 age 4 字节 double 8 字节
-    age 按照 8 字节补齐
-    2 算的时候按照 基本数据类型计算
-    3 首先会把所有的字节数加起来 是否能够整除 最大属性（基本数据类型）的字节数 ，如果
-    不够会往上累加 直到能整除为止
-    4
 
 
