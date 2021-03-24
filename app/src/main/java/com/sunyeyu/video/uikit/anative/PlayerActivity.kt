@@ -121,11 +121,10 @@ class PlayerActivity : AppCompatActivity() {
         nativeOpengl.playFromFFmpeg("")
         //直接通过 ip 地址 播放 可减少起播时间
         nativeOpengl.setUrl("http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4")
-//        nativeOpengl.playFromFFmpeg("http://128.30.52.156/2010/05/sintel/trailer.mp4");
           nativeOpengl.setPreparedListner {
-            Log.i("syy", "duration" + nativeOpengl.duration)
-//                handler.post(
-//                    runnable)
+              thread.start();
+                handler.post(
+                    runnable)
         }
 
 
@@ -231,7 +230,7 @@ class PlayerActivity : AppCompatActivity() {
         thread.start()
      }
     fun stop(view: View) {
-//        handler.removeCallbacksAndMessages(null)
+        handler.removeCallbacksAndMessages(null)
         nativeOpengl.surfaceDestroy()
     }
 
