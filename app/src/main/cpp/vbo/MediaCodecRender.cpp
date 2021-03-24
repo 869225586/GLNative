@@ -100,7 +100,7 @@ void MediaCodecRender::onDraw() {
 }
 
 void MediaCodecRender::destroyGl() {
-    glDeleteTextures(1, &texture);
+    glDeleteTextures(1, &cameraId);
     glDetachShader(program, vShader);
     glDetachShader(program, fShader);
     glDeleteShader(vShader);

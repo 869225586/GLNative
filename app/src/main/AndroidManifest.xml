@@ -13,22 +13,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name="com.sunyeyu.video.uikit.anative.CameraActivity"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:name="com.sunyeyu.video.uikit.anative.PlayerActivity">
+        <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.sunyeyu.video.uikit.anative.MainActivity">
-
+        <activity
+            android:name=".CameraActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".PlayerActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
+        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>

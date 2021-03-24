@@ -21,6 +21,7 @@ public:
     EglThread *wlEglThread = NULL;
     ANativeWindow *nativeWindow = NULL;
     BaseRender *baseRender = NULL;
+    BaseRender *mediaCodecRen = NULL;
 
     FFmpeg *ffmpeg = NULL;
 

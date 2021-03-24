@@ -19,6 +19,9 @@ void callback_SurfaceCrete(void *ctx) {
         if (wlOpengl->baseRender != NULL) {
             wlOpengl->baseRender->onCreate();
         }
+        if (wlOpengl->mediaCodecRen != NULL) {
+            wlOpengl->mediaCodecRen->onCreate();
+        }
     }
     LOGD("toPlay");
 //    if(wlOpengl->ffmpeg!=NULL){
@@ -33,6 +36,9 @@ void callback_SurfacChange(int width, int height, void *ctx) {
         if (wlOpengl->baseRender != NULL) {
             wlOpengl->baseRender->onChange(width, height);
         }
+        if (wlOpengl->mediaCodecRen != NULL) {
+            wlOpengl->mediaCodecRen->onChange(width, height);
+        }
     }
 }
 
@@ -40,8 +46,14 @@ void callback_SurfaceDraw(void *ctx) {
 
     Opengl *wlOpengl = static_cast<Opengl *>(ctx);
     if (wlOpengl != NULL) {
-        if (wlOpengl->baseRender != NULL) {
-            wlOpengl->baseRender->onDraw();
+        if (wlOpengl->ffmpeg->surpportMediaCodec) {
+            if (wlOpengl->mediaCodecRen != NULL) {
+                wlOpengl->mediaCodecRen->onDraw();
+            }
+        } else {
+            if (wlOpengl->baseRender != NULL) {
+                wlOpengl->baseRender->onDraw();
+            }
         }
     }
 }
@@ -107,9 +119,17 @@ void Opengl::onDestorySurface() {
     }
 
     if (baseRender != NULL) {
+        baseRender->destroyGl();
         baseRender->destroyData();
         delete baseRender;
         baseRender = NULL;
+    }
+    if(mediaCodecRen !=NULL){
+        mediaCodecRen->destroyGl();
+        mediaCodecRen->destroyData();
+        delete  mediaCodecRen;
+        mediaCodecRen = NULL;
+
     }
     if (nativeWindow != NULL) {
         ANativeWindow_release(nativeWindow);
@@ -150,9 +170,16 @@ void Opengl::onChangeFilter() {
 }
 
 void Opengl::setYuvData(void *y, void *u, void *v, int w, int h) {
-    if (baseRender != NULL) {
-        baseRender->setYuvData(y, u, v, w, h);
+    if (ffmpeg->surpportMediaCodec) {
+        if (mediaCodecRen != NULL) {
+            mediaCodecRen->setYuvData(y, u, v, w, h);
+        }
+    } else {
+        if (baseRender != NULL) {
+            baseRender->setYuvData(y, u, v, w, h);
+        }
     }
+
     if (wlEglThread != NULL) {
         wlEglThread->notifyRender();
     }
@@ -167,28 +194,28 @@ void Opengl::preparedFromFFmpeg(PlayStatus *playStatus, CallJava *callJava) {
 
 Opengl::Opengl(CallJava *callJava) {
     LOGD("initOpenGl");
-//    baseRender = new FilFilterVboYuv();
+    baseRender = new FilFilterVboYuv();
 //    baseRender = new CameraRender(callJava);
-     baseRender = new MediaCodecRender(callJava);
+    mediaCodecRen = new MediaCodecRender(callJava);
 }
 
 void Opengl::pause() {
-   if(ffmpeg!=NULL){
-       ffmpeg->pause();
-   }
+    if (ffmpeg != NULL) {
+        ffmpeg->pause();
+    }
 }
 
 void Opengl::resume() {
-    if(ffmpeg!=NULL){
+    if (ffmpeg != NULL) {
         ffmpeg->resume();
     }
 
 }
 
 void Opengl::changeFullScreen(bool fuscreen) {
-     if(baseRender!=NULL){
-         baseRender->changeFullScreen(fuscreen);
-     }
+    if (baseRender != NULL) {
+        baseRender->changeFullScreen(fuscreen);
+    }
 }
 
 long Opengl::getDuration() {
@@ -196,20 +223,20 @@ long Opengl::getDuration() {
 }
 
 void Opengl::seek(long mis) {
-    if(ffmpeg!=NULL){
+    if (ffmpeg != NULL) {
         ffmpeg->seek(mis);
     }
 }
 
 void Opengl::setUrl(const char *url) {
-     if(ffmpeg!=NULL){
-         ffmpeg->setUrl(url);
-     }
+    if (ffmpeg != NULL) {
+        ffmpeg->setUrl(url);
+    }
 }
 
 void Opengl::start() {
-    if(ffmpeg!=NULL){
-      ffmpeg->start();
+    if (ffmpeg != NULL) {
+        ffmpeg->start();
     }
 }
 
