@@ -1,7 +1,6 @@
 package com.sunyeyu.video.uikit.anative
 
 import android.content.pm.ActivityInfo
-import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -12,16 +11,11 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.postDelayed
 import com.sunyeyu.video.uikit.opengl.MyTextureView
 import com.sunyeyu.video.uikit.opengl.NativeOpengl
-import com.sunyeyu.video.uikit.opengl.WlSurfaceView
-import com.sunyeyu.video.uikit.util.DnsUitl
-import com.sunyeyu.video.uikit.util.LogUtils
 import com.sunyeyu.video.uikit.util.TimeUtil
 import java.io.File
 import java.io.FileInputStream
-import java.net.InetAddress
 
 /**
  * 驯龙高手 http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4
@@ -120,7 +114,7 @@ class PlayerActivity : AppCompatActivity() {
         myTextureView.setNativeOpengl(nativeOpengl)
         nativeOpengl.playFromFFmpeg("")
         //直接通过 ip 地址 播放 可减少起播时间
-        nativeOpengl.setUrl("http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4")
+        nativeOpengl.setUrl("http://stream.iqilu.com/vod_bag_2016//2020/02/16/903BE158056C44fcA9524B118A5BF230/903BE158056C44fcA9524B118A5BF230_H264_mp4_500K.mp4")
           nativeOpengl.setPreparedListner {
               thread.start();
                 handler.post(
@@ -165,8 +159,9 @@ class PlayerActivity : AppCompatActivity() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 var progress = seekbar.progress;
-                var mills = 100*1.0f/nativeOpengl.duration*progress;
-                nativeOpengl.seek(mills.toLong())
+                var mills = (100*1.0f)/nativeOpengl.duration*progress;
+                Log.i("native_E","seek${nativeOpengl.duration * progress / 100}");
+                nativeOpengl.seek((nativeOpengl.duration * progress / 100).toInt())
             }
 
         })

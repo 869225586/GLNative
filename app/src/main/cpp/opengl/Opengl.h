@@ -61,7 +61,7 @@ public:
 
     long getDuration();
 
-    void seek(long mills);
+    void seek(int mills);
 };
 
 

@@ -12,4 +12,6 @@
 
 #define LOGV(FORMAT,...) __android_log_print(ANDROID_LOG_DEBUG,"native_V",FORMAT,##__VA_ARGS__);
 
+#define LOGI(FORMAT,...) __android_log_print(ANDROID_LOG_DEBUG,"native_I",FORMAT,##__VA_ARGS__);
+
 #endif //NATIVE_ANDROIDLOG_H

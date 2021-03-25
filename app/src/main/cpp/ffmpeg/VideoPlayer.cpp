@@ -58,10 +58,8 @@ void *playVideo(void *data) {
                 }
                 while(av_bsf_receive_packet(videoPlayer->abs_ctx, avPacket) == 0)
                 {
-                    LOGE("开始解码");
-
                     double diff = videoPlayer->getFrameDiffTime(NULL, avPacket);
-                    LOGE("diff is %f", diff);
+                    LOGI("diff is %f", diff);
 
                     av_usleep(videoPlayer->getDelayTime(diff) * 1000000);
                     videoPlayer->callJava->onCallDecodeAVPacket(avPacket->size, avPacket->data);
@@ -238,7 +236,9 @@ void VideoPlayer::release() {
     if(queue!=NULL){
         queue->notifyQueue();//唤醒队列
     }
-    pthread_join(thread_play,NULL); //等待线程执行完毕
+    if(thread_play!=NULL){
+        pthread_join(thread_play,NULL); //等待线程执行完毕
+    }
     if (queue != NULL) {
         delete (queue);
         queue = NULL;

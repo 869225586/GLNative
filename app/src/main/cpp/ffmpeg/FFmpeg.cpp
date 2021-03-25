@@ -253,7 +253,7 @@ void FFmpeg::resume() {
 
 
 void FFmpeg::seek(int64_t seconds) {
-    LOGE("seek time %d", seconds);
+    LOGE("seek time %lld", seconds);
     if (duration <= 0) {
         return;
     }
@@ -261,7 +261,7 @@ void FFmpeg::seek(int64_t seconds) {
         playStatus->seek = true;
         pthread_mutex_lock(&seek_mutex);
         int64_t rel = seconds * AV_TIME_BASE;
-        LOGE("rel time %d", seconds);
+        LOGE("rel time %lld", seconds);
         avformat_seek_file(pFormatCtx, -1,
                            INT64_MIN, rel, INT64_MAX, 0);
         if (audioPlayer != NULL) {

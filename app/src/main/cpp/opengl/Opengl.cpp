@@ -222,7 +222,7 @@ long Opengl::getDuration() {
     return ffmpeg->duration;
 }
 
-void Opengl::seek(long mis) {
+void Opengl::seek(int mis) {
     if (ffmpeg != NULL) {
         ffmpeg->seek(mis);
     }

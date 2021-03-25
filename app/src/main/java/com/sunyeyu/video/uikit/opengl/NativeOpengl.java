@@ -157,7 +157,7 @@ public class NativeOpengl {
 
     public native long getDuration();
 
-    public native void seek(long second);
+    public native void seek(int second);
 
     public native void setUrl(String url);
 

@@ -131,10 +131,9 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
             //TODO 视频结束 这个方法还在调用  需要check
             if (wlAudio->clock - wlAudio->preTime >= 0.1) { //间隔多久回调 0.1秒 不能 太长 太长 最后一秒回调不了
                 wlAudio->preTime = wlAudio->clock;
-                LOGD("curPos %f",wlAudio->clock);
+                LOGI("curPos %f",wlAudio->clock);
                 //回调应用层
                 wlAudio->callJava->onCallTimeInfo(wlAudio->clock, wlAudio->duration);
-                LOGE("audio 回调java ");
             }
             (*wlAudio->pcmBufferQueue)->Enqueue(wlAudio->pcmBufferQueue, (char *) wlAudio->buffer,
                                                 buffersize);
