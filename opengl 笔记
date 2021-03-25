@@ -73,7 +73,13 @@
      头文件 开始都有个这个宏定义，如果这个还是用的被拷贝的那个文件的宏，那么
      你复制出来的文件 等于没有创建 所以是找不到的。你要把这个东西改名
 
-
+     4
+     add_library(postproc-54 SHARED IMPORTED)
+     set_target_properties(postproc-54
+             PROPERTIES IMPORTED_LOCATION
+             ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${CMAKE_ANDROID_ARCH_ABI}/libpostproc-54.so)
+     add_library(postproc-54  名字 要与下面的一致 不然编译的时候回报错
+    set_target_properties(postproc-54
 
 
     avformat_open_input / 返回的错误码及解释
