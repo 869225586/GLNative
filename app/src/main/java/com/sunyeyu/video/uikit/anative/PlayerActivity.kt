@@ -1,21 +1,31 @@
 package com.sunyeyu.video.uikit.anative
 
+import android.R.attr.startX
+import android.R.attr.startY
+import android.content.Context
 import android.content.pm.ActivityInfo
+import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.blankj.utilcode.util.BrightnessUtils
+import com.blankj.utilcode.util.ScreenUtils
 import com.sunyeyu.video.uikit.opengl.MyTextureView
 import com.sunyeyu.video.uikit.opengl.NativeOpengl
 import com.sunyeyu.video.uikit.util.TimeUtil
 import java.io.File
 import java.io.FileInputStream
+
 
 /**
  * 驯龙高手 http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4
@@ -77,6 +87,8 @@ class PlayerActivity : AppCompatActivity() {
     lateinit var seekbar:SeekBar;
     lateinit var mTvMin : TextView
     var isexit = false
+    private var startX=0;
+    private var startY=0;
     private var handler :Handler = object : Handler(){
 
     }
@@ -229,4 +241,60 @@ class PlayerActivity : AppCompatActivity() {
         nativeOpengl.surfaceDestroy()
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        val screenWidth: Int = ScreenUtils.getScreenWidth()
+        when (event!!.action) {
+            MotionEvent.ACTION_DOWN -> {
+                startX = event!!.x.toInt()
+                startY = event!!.y.toInt()
+            }
+            MotionEvent.ACTION_MOVE -> {
+                val endY = event!!.y
+                val distanceY = startY - endY
+                if (startX > screenWidth / 2) {
+                    // 右边
+                    // 在这里处理音量
+                    val FLING_MIN_DISTANCE = 30.0
+                    val FLING_MIN_VELOCITY = 30.0
+                    val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                    if (distanceY > FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                        startY = endY.toInt()
+                        am.adjustStreamVolume(
+                            AudioManager.STREAM_MUSIC,
+                            AudioManager.ADJUST_RAISE,
+                            AudioManager.FLAG_SHOW_UI
+                        )
+                    }
+                    if (distanceY < FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                        startY = endY.toInt()
+                        am.adjustStreamVolume(
+                            AudioManager.STREAM_MUSIC,
+                            AudioManager.ADJUST_LOWER,
+                            AudioManager.FLAG_SHOW_UI
+                        )
+                    }
+                } else {
+                    // 屏幕左半部分上滑，亮度变大，下滑，亮度变小
+                    val FLING_MIN_DISTANCE = 0.5
+                    val FLING_MIN_VELOCITY = 0.5
+                    if (distanceY > FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                        var brightness: Int = BrightnessUtils.getWindowBrightness(window)
+                        brightness += 3
+                        if (brightness < 255) {
+                            BrightnessUtils.setWindowBrightness(window, brightness)
+                        }
+                    }
+                    if (distanceY < FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                        var brightness: Int = BrightnessUtils.getWindowBrightness(window)
+                        brightness -= 3
+                        if (brightness > 0) {
+                            BrightnessUtils.setWindowBrightness(window, --brightness)
+                        }
+                    }
+                }
+            }
+        }
+        return super.onTouchEvent(event)
+    }
 }
