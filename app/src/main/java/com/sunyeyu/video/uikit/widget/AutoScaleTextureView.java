@@ -16,7 +16,7 @@ import androidx.annotation.IntDef;
  * 自适应  填充 缩放 裁剪
  * 要先设置视频的宽高 根据视频的宽高setVideoSize()计算 缩放和平移矩阵
  */
-public class MyTextureView extends FrameLayout implements TextureView.SurfaceTextureListener {
+public class AutoScaleTextureView extends FrameLayout implements TextureView.SurfaceTextureListener {
     @Retention(RetentionPolicy.SOURCE)
     @IntDef(value={VideoScalConst.MODE_SCALE_FIT,VideoScalConst.MODE_NOSCALE_TO_FIT,VideoScalConst.MODE_SCALE_TO_FIT_CROPPING})
     public @interface VideoScalConst{
@@ -34,18 +34,18 @@ public class MyTextureView extends FrameLayout implements TextureView.SurfaceTex
     private SurfaceTexture mSurfaceTexture;
 
 
-    public MyTextureView(Context context) {
+    public AutoScaleTextureView(Context context) {
         super(context);
         initVideoView(context);
     }
 
 
-    public MyTextureView(Context context, AttributeSet attrs) {
+    public AutoScaleTextureView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
 
-    public MyTextureView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public AutoScaleTextureView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initVideoView(context);
     }

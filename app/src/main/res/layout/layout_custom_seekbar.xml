@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="30dp"
+	android:orientation="horizontal">
+	<RelativeLayout
+		android:id="@+id/rl_seek"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:paddingLeft="20dp"
+		android:paddingRight="20dp">
+
+		<TextView
+			android:id="@+id/tv_time_left"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_centerVertical="true"
+			android:includeFontPadding="false"
+			android:text="00:00"
+			android:textColor="@color/text_white"
+			android:textSize="12sp" />
+
+		<SeekBar
+			android:id="@+id/seek_bar"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_centerInParent="true"
+			android:layout_marginLeft="30dp"
+			android:layout_marginRight="30dp"
+			android:max="100"
+			android:maxHeight="3dip"
+			android:minHeight="3dip"
+			android:progress="0"
+			android:progressDrawable="@drawable/item_seek"
+			android:thumb="@drawable/item_thumb" />
+
+		<TextView
+			android:id="@+id/tv_time_right"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_centerVertical="true"
+			android:includeFontPadding="false"
+			android:text="00:00"
+			android:textColor="@color/text_white"
+			android:textSize="12sp" />
+	</RelativeLayout>
+</LinearLayout>

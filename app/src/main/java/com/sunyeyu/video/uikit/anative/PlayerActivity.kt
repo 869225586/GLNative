@@ -1,9 +1,8 @@
 package com.sunyeyu.video.uikit.anative
 
-import android.R.attr.startX
-import android.R.attr.startY
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -11,18 +10,19 @@ import android.os.Handler
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.widget.LinearLayout
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.BrightnessUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.sunyeyu.video.uikit.opengl.MyTextureView
 import com.sunyeyu.video.uikit.opengl.NativeOpengl
-import com.sunyeyu.video.uikit.util.TimeUtil
+import com.sunyeyu.video.uikit.util.MyClickListener
+import com.sunyeyu.video.uikit.util.MyClickListener.MyClickCallBack
+import com.sunyeyu.video.uikit.widget.CustomSeekBar
 import java.io.File
 import java.io.FileInputStream
 
@@ -81,89 +81,97 @@ class PlayerActivity : AppCompatActivity() {
     var isClick = true
     lateinit var fis: FileInputStream;
     lateinit var nativeOpengl: NativeOpengl
-    lateinit var ll_window:LinearLayout //窗口容器
+    lateinit var ll_window: RelativeLayout //窗口容器
+    lateinit var rl_player: RelativeLayout
     lateinit var myTextureView: MyTextureView
-    lateinit var tv_time :TextView;
-    lateinit var seekbar:SeekBar;
-    lateinit var mTvMin : TextView
+    lateinit var seekbar: CustomSeekBar;
+    lateinit var iv_pause: ImageView
     var isexit = false
-    private var startX=0;
-    private var startY=0;
-    private var handler :Handler = object : Handler(){
+    private var startX = 0;
+    private var startY = 0;
+    private var handler: Handler = object : Handler() {
 
     }
-    var thread:Thread= object :Thread(){
+    var thread: Thread = object : Thread() {
         override fun run() {
             nativeOpengl.start()
         }
     }
-    public var runnable :Runnable = object :Runnable {
+    public var runnable: Runnable = object : Runnable {
         override fun run() {
             var totalduration = nativeOpengl.duration
             var currentpos = nativeOpengl.currentPos
-            tv_time.text=TimeUtil.getMinute(currentpos.toLong())+"/"+TimeUtil.getMinute(totalduration)
-            seekbar.progress = (currentpos/(totalduration*1.0f/100)).toInt()
-            handler.postDelayed(this,1000)
+            seekbar.setTvleft(currentpos.toLong())
+            seekbar.setTvRight(totalduration)
+            seekbar.progress = (currentpos / (totalduration * 1.0f / 100)).toInt()
+            handler.postDelayed(this, 1000)
         }
 
     }
-
+    private val menuRunnable = Runnable { rl_player.visibility = View.GONE }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_yuv)
+        setContentView(R.layout.layout_play)
         initView()
         initPlayer()
     }
 
     internal fun initPlayer() {
-//        Thread(){
-//            var iparray= DnsUitl.parseHostGetIPAddress("www.baidu.com")
-//            iparray?.forEach { item->
-//                LogUtils.I("ip $item")
-//            }
-//        }.start()
         nativeOpengl = NativeOpengl()
         myTextureView.setNativeOpengl(nativeOpengl)
         nativeOpengl.playFromFFmpeg("")
         //直接通过 ip 地址 播放 可减少起播时间
         nativeOpengl.setUrl("http://stream.iqilu.com/vod_bag_2016//2020/02/16/903BE158056C44fcA9524B118A5BF230/903BE158056C44fcA9524B118A5BF230_H264_mp4_500K.mp4")
-          nativeOpengl.setPreparedListner {
-              thread.start();
-                handler.post(
-                    runnable)
+        nativeOpengl.setPreparedListner {
+            thread.start();
+            handler.post(
+                runnable
+            )
         }
-
 
     }
 
     private fun initView() {
         ll_window = findViewById(R.id.ll_window)
-        tv_time = findViewById(R.id.duration)
         seekbar = findViewById(R.id.seekbar)
-        mTvMin  = findViewById(R.id.tv_mini)
+        rl_player = findViewById(R.id.rl_player)
 
         myTextureView = MyTextureView(this);
-        var lp = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.MATCH_PARENT
+        var lp = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.MATCH_PARENT
         )
-        ll_window.addView(myTextureView, lp)
-        mTvMin.setOnClickListener{
-              mini()
-        }
-        myTextureView.setOnClickListener {
-            if (isClick) {
-                isClick = false;
-                nativeOpengl.pause()
-            } else {
-                isClick = true;
-                nativeOpengl.resume()
+
+        ll_window.addView(myTextureView,0, lp)
+        myTextureView.setOnTouchListener(MyClickListener(object : MyClickCallBack {
+            override fun oneClick() {
+                if (resources.configuration.orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+                    doubleClick()
+                } else {
+                    if (rl_player.visibility == View.VISIBLE) {
+                        rl_player.visibility = View.GONE
+                    } else {
+                        rl_player.visibility = View.VISIBLE
+                    }
+                }
             }
-        }
 
-        seekbar.setOnSeekBarChangeListener(object: OnSeekBarChangeListener {
+            override fun doubleClick() {
+                try {
+                    if (iv_pause.getVisibility() === View.GONE) {
+                        iv_pause.setVisibility(View.VISIBLE)
+                        nativeOpengl.pause()
+                    } else {
+                        nativeOpengl.start()
+                        iv_pause.setVisibility(View.GONE)
+                    }
+                } catch (e: java.lang.Exception) {
+                }
+            }
+        }))
+        seekbar.setSeekbarChange(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-
+               removeMenuTask()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -171,15 +179,36 @@ class PlayerActivity : AppCompatActivity() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 var progress = seekbar.progress;
-                var mills = (100*1.0f)/nativeOpengl.duration*progress;
-                Log.i("native_E","seek${nativeOpengl.duration * progress / 100}");
+                var mills = (100 * 1.0f) / nativeOpengl.duration * progress;
+                Log.i("native_E", "seek${nativeOpengl.duration * progress / 100}");
                 nativeOpengl.seek((nativeOpengl.duration * progress / 100).toInt())
+                startMenuTask()
             }
-
         })
     }
+
     override fun onDestroy() {
         super.onDestroy()
+
+    }
+
+    private fun startMenuTask() {
+        if (resources.configuration.orientation == ActivityInfo.SCREEN_ORIENTATION_USER) {
+            handler.postDelayed(menuRunnable, 5000)
+        }
+    }
+
+    private fun removeMenuTask() {
+        handler.removeCallbacks(menuRunnable)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (newConfig.orientation === ActivityInfo.SCREEN_ORIENTATION_USER) {
+            startMenuTask()
+        } else {
+            removeMenuTask()
+        }
 
     }
 
@@ -187,17 +216,15 @@ class PlayerActivity : AppCompatActivity() {
      * 开启全屏播放
      */
     fun fullScreen(view: View) {
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        ll_window.layoutParams.height = RelativeLayout.LayoutParams.MATCH_PARENT;
+        if (resources.configuration.orientation == ActivityInfo.SCREEN_ORIENTATION_USER) {
+            ll_window.layoutParams.height = 900
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        } else {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            ll_window.layoutParams.height = RelativeLayout.LayoutParams.MATCH_PARENT;
+        }
     }
 
-    /**
-     * 最小化播放器
-     */
-    fun mini(){
-        ll_window.layoutParams.height = 900
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-    }
     /**
      * 解析本地yuv 视频
      */
@@ -235,7 +262,8 @@ class PlayerActivity : AppCompatActivity() {
 
     fun play(view: View) {
         thread.start()
-     }
+    }
+
     fun stop(view: View) {
         handler.removeCallbacksAndMessages(null)
         nativeOpengl.surfaceDestroy()
@@ -243,55 +271,61 @@ class PlayerActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        val screenWidth: Int = ScreenUtils.getScreenWidth()
-        when (event!!.action) {
-            MotionEvent.ACTION_DOWN -> {
-                startX = event!!.x.toInt()
-                startY = event!!.y.toInt()
-            }
-            MotionEvent.ACTION_MOVE -> {
-                val endY = event!!.y
-                val distanceY = startY - endY
-                if (startX > screenWidth / 2) {
-                    // 右边
-                    // 在这里处理音量
-                    val FLING_MIN_DISTANCE = 30.0
-                    val FLING_MIN_VELOCITY = 30.0
-                    val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                    if (distanceY > FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
-                        startY = endY.toInt()
-                        am.adjustStreamVolume(
-                            AudioManager.STREAM_MUSIC,
-                            AudioManager.ADJUST_RAISE,
-                            AudioManager.FLAG_SHOW_UI
-                        )
-                    }
-                    if (distanceY < FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
-                        startY = endY.toInt()
-                        am.adjustStreamVolume(
-                            AudioManager.STREAM_MUSIC,
-                            AudioManager.ADJUST_LOWER,
-                            AudioManager.FLAG_SHOW_UI
-                        )
-                    }
-                } else {
-                    // 屏幕左半部分上滑，亮度变大，下滑，亮度变小
-                    val FLING_MIN_DISTANCE = 0.5
-                    val FLING_MIN_VELOCITY = 0.5
-                    if (distanceY > FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
-                        var brightness: Int = BrightnessUtils.getWindowBrightness(window)
-                        brightness += 3
-                        if (brightness < 255) {
-                            BrightnessUtils.setWindowBrightness(window, brightness)
+        if (resources.configuration.orientation == ActivityInfo.SCREEN_ORIENTATION_USER) {
+            val screenWidth: Int = ScreenUtils.getScreenWidth()
+            when (event!!.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    removeMenuTask()
+                    startX = event!!.x.toInt()
+                    startY = event!!.y.toInt()
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val endY = event!!.y
+                    val distanceY = startY - endY
+                    if (startX > screenWidth / 2) {
+                        // 右边
+                        // 在这里处理音量
+                        val FLING_MIN_DISTANCE = 30.0
+                        val FLING_MIN_VELOCITY = 30.0
+                        val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                        if (distanceY > FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                            startY = endY.toInt()
+                            am.adjustStreamVolume(
+                                AudioManager.STREAM_MUSIC,
+                                AudioManager.ADJUST_RAISE,
+                                AudioManager.FLAG_SHOW_UI
+                            )
+                        }
+                        if (distanceY < FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                            startY = endY.toInt()
+                            am.adjustStreamVolume(
+                                AudioManager.STREAM_MUSIC,
+                                AudioManager.ADJUST_LOWER,
+                                AudioManager.FLAG_SHOW_UI
+                            )
+                        }
+                    } else {
+                        // 屏幕左半部分上滑，亮度变大，下滑，亮度变小
+                        val FLING_MIN_DISTANCE = 30
+                        val FLING_MIN_VELOCITY = 30
+                        if (distanceY > FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                            var brightness: Int = BrightnessUtils.getWindowBrightness(window)
+                            brightness += 3
+                            if (brightness < 255) {
+                                BrightnessUtils.setWindowBrightness(window, brightness)
+                            }
+                        }
+                        if (distanceY < FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                            var brightness: Int = BrightnessUtils.getWindowBrightness(window)
+                            brightness -= 3
+                            if (brightness > 0) {
+                                BrightnessUtils.setWindowBrightness(window, --brightness)
+                            }
                         }
                     }
-                    if (distanceY < FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
-                        var brightness: Int = BrightnessUtils.getWindowBrightness(window)
-                        brightness -= 3
-                        if (brightness > 0) {
-                            BrightnessUtils.setWindowBrightness(window, --brightness)
-                        }
-                    }
+                }
+                MotionEvent.ACTION_UP -> {
+                    startMenuTask()
                 }
             }
         }
