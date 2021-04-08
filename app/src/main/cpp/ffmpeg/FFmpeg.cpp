@@ -8,7 +8,7 @@ FFmpeg::FFmpeg(PlayStatus *playStatus, CallJava *callJava) {
     this->playStatus = playStatus;
     this->callJava = callJava;
     exit = false;
-    videoPlayer = new VideoPlayer(playStatus,callJava);
+    videoPlayer = new VideoPlayer(playStatus, callJava);
     pthread_mutex_init(&init_mutex, NULL);
     pthread_mutex_init(&seek_mutex, NULL);
 }
@@ -49,6 +49,13 @@ void FFmpeg::decodeFFmpegThread() {
     pthread_mutex_lock(&init_mutex);
     av_register_all(); //注册
     avformat_network_init();//开启网络
+    AVDictionary *options = NULL;
+    av_dict_set(&options, "buffer_size", "1024000", 0);
+    av_dict_set(&options, "stimeout", "20000000", 0);  //设置超时断开连接时间
+//    av_dict_set(&options, "fflags", "nobuffer", 0); //这个导致 首帧 绿屏不能用
+// 设置解码 无缓存，解码时有效
+    av_dict_set(&options, "rtsp_transport", "tcp", 0);  //以udp方式打开rtsp，如果以tcp方式打开将udp替换为tcp
+
     pFormatCtx = avformat_alloc_context();//申请上下文内存空间
 
     //防止播放退出还在请求网络 设置了一个回调
@@ -61,11 +68,11 @@ void FFmpeg::decodeFFmpegThread() {
         和max_analy_duration （设置探测处理时长）
      */
 
-    pFormatCtx->probesize = 1024 *8;
-    pFormatCtx->max_analyze_duration = 1000 ;
-    int result = avformat_open_input(&pFormatCtx, url, NULL, NULL);
-    if (result!= 0) {
-        LOGE("can not open url : %s,%s,%d", url,"error_code",result)
+    pFormatCtx->probesize = 1024 * 8;
+    pFormatCtx->max_analyze_duration = 1000;
+    int result = avformat_open_input(&pFormatCtx, url, NULL, &options);
+    if (result != 0) {
+        LOGE("can not open url : %s,%s,%d", url, "error_code", result)
         //TODO 回调给native 端
         exitByInitError();
         return;
@@ -84,14 +91,15 @@ void FFmpeg::decodeFFmpegThread() {
             LOGE("解析到音频流");
             //获取到音频
             if (audioPlayer == NULL) {
-                audioPlayer = new AudioPlayer(playStatus,avStream->codecpar->sample_rate,callJava);
+                audioPlayer = new AudioPlayer(playStatus, avStream->codecpar->sample_rate,
+                                              callJava);
                 audioPlayer->streamIndex = i;
                 audioPlayer->codePar = avStream->codecpar;
                 //AV_TIME_BASE 是微妙 1000 000  ，得到几 秒
                 audioPlayer->duration = pFormatCtx->duration / AV_TIME_BASE;
                 audioPlayer->time_base = avStream->time_base;
                 duration = audioPlayer->duration;
-                LOGE("duration---:%d",duration);
+                LOGE("duration---:%d", duration);
             }
         } else if (avStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
             LOGE("解析到视频流");
@@ -154,10 +162,11 @@ void FFmpeg::decodeFFmpegThread() {
         videoPlayer->abs_ctx->time_base_in = videoPlayer->time_base;
     }
     end:
-    surpportMediaCodec=true;//TODO 硬解现在还有点问题
+    surpportMediaCodec = true;//TODO 硬解现在还有点问题
     if (surpportMediaCodec) {
         videoPlayer->codecType = CODEC_MEDIACODEC;
-        LOGE("video width :%d,video height:%d",videoPlayer->avCodecContext->width,videoPlayer->avCodecContext->height);
+        LOGE("video width :%d,video height:%d", videoPlayer->avCodecContext->width,
+             videoPlayer->avCodecContext->height);
         videoPlayer->callJava->
                 onCallInitMediacodec(
                 codecName,
@@ -201,7 +210,7 @@ void FFmpeg::start() {
                 audioPlayer->queue->putAvpacket(avPacket);
             } else if (avPacket->stream_index == videoPlayer->streamIndex) {
                 //第一次 走到这里 说明首帧出现
-                    LOGV("解析")
+                LOGV("解析")
                 videoPlayer->queue->putAvpacket(avPacket);
             } else {
                 av_packet_free(&avPacket);
@@ -347,10 +356,9 @@ void FFmpeg::release() {
         LOGE("释放 封装格式上下文");
     }
     LOGE("释放 callJava");
-     if(callJava != NULL)
-     {
-         callJava = NULL;
-     }
+    if (callJava != NULL) {
+        callJava = NULL;
+    }
     LOGE("释放 playstatus");
     if (playStatus != NULL) {
         playStatus = NULL;
