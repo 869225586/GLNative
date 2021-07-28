@@ -1,2 +1,3 @@
 include ':app'
+include ':MyDanMu'
 rootProject.name = "Native"

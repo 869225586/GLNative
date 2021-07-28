@@ -30,7 +30,7 @@ public:
     int surfaceHeight = 0;
 
     typedef void (*onCreate)(void *);//定义回调函数 变量名称为onCreate  参数类型为void *  == java 的object
-    onCreate create; //成员变量用于赋值
+    onCreate create; //声明方法变量用于赋值 方法对象
     void *onCreateCtx; //回调的参数 声明成员变量 用于赋值
 
     typedef void (*onChange)(int width, int height, void *);

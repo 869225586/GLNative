@@ -8,12 +8,14 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.BrightnessUtils
@@ -23,6 +25,7 @@ import com.sunyeyu.video.uikit.opengl.NativeOpengl
 import com.sunyeyu.video.uikit.util.MyClickListener
 import com.sunyeyu.video.uikit.util.MyClickListener.MyClickCallBack
 import com.sunyeyu.video.uikit.widget.CustomSeekBar
+import com.syy.video.danmu.widget.BrrageTextureView
 import java.io.File
 import java.io.FileInputStream
 
@@ -76,6 +79,8 @@ http://vfx.mtime.cn/Video/2019/03/12/mp4/190312143927981075.mp4
 http://vfx.mtime.cn/Video/2019/03/12/mp4/190312083533415853.mp4
 
 http://vfx.mtime.cn/Video/2019/03/09/mp4/190309153658147087.mp4
+
+https://v2.dious.cc/20201022/0FQ3EJxy/index.m3u8
  */
 class PlayerActivity : AppCompatActivity() {
     var isClick = true
@@ -84,6 +89,7 @@ class PlayerActivity : AppCompatActivity() {
     lateinit var ll_window: RelativeLayout //窗口容器
     lateinit var rl_player: RelativeLayout
     lateinit var myTextureView: MyTextureView
+    lateinit var  brrageView :BrrageTextureView
     lateinit var seekbar: CustomSeekBar;
     lateinit var iv_pause: ImageView
     var isexit = false
@@ -114,6 +120,56 @@ class PlayerActivity : AppCompatActivity() {
         setContentView(R.layout.layout_play)
         initView()
         initPlayer()
+        startBrrage()//开启弹幕
+    }
+
+    private var currentSystemMills: Long = 0
+    var count = 0
+    var isRun = true
+    private fun startBrrage() {
+        object : Thread() {
+            override fun run() {
+                while (isRun) {
+                    if (brrageView.controller == null) continue
+                    if (currentSystemMills == 0L) {
+                        currentSystemMills = System.currentTimeMillis()
+                        handler.post(Runnable {
+                            addBrrage(
+                                "你好",
+                                "今天是什么新闻",
+                                "https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=3512331237,2033775251&fm=27&gp=0.jpg"
+                            )
+                        })
+                        count++
+                    } else {
+                        if (System.currentTimeMillis() - currentSystemMills > 500 && count <= 100) {
+                            handler.post(Runnable {
+                                addBrrage(
+                                    "哈哈",
+                                    "主持人很好看啊",
+                                    "https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=3512331237,2033775251&fm=27&gp=0.jpg"
+                                )
+                            })
+                            currentSystemMills = System.currentTimeMillis()
+                            count++
+                        } else {
+                            if (count > 100) {
+                                isRun = false
+                            }
+                        }
+                    }
+                }
+            }
+        }
+            .start()
+    }
+    private fun addBrrage(name: String, msg: String, imgUrl: String) {
+        val templateView: View = LayoutInflater.from(this).inflate(R.layout.barrage, null)
+        var tvBarrageName = templateView.findViewById<TextView>(R.id.tvBarrageName);
+        var tvBarrageMsg = templateView.findViewById<TextView>(R.id.tvBarrageMsg);
+        tvBarrageName.text = name
+        tvBarrageMsg.text = msg
+        brrageView.controller.add(templateView)
     }
 
     internal fun initPlayer() {
@@ -135,7 +191,7 @@ class PlayerActivity : AppCompatActivity() {
         ll_window = findViewById(R.id.ll_window)
         seekbar = findViewById(R.id.seekbar)
         rl_player = findViewById(R.id.rl_player)
-
+        brrageView = findViewById(R.id.dmView)
         myTextureView = MyTextureView(this);
         var lp = RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.MATCH_PARENT,

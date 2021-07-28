@@ -171,7 +171,7 @@ void AudioPlayer::initOpenSLEs() {
 
     // 第三步，配置PCM格式信息
     SLDataLocator_AndroidSimpleBufferQueue android_queue = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
-                                                            2};
+                                                              2};
     SLDataFormat_PCM pcm = {
             SL_DATAFORMAT_PCM,//播放pcm格式的数据
             2,//2个声道（立体声）
