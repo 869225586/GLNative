@@ -27,8 +27,7 @@ public:
 
     int putAvpacket(AVPacket *packet); //加入队列
     int getAvpacket(AVPacket *packet); //将你传入的avpacket 赋值 并不是 int 返回
-
-    int getQueueSize();
+     int getQueueSize();
     void clearQueue();
     int notifyQueue();
 

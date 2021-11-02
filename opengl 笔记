@@ -35,12 +35,14 @@
     3 MediaCodec 硬解 流程
         1 初始化egl 环境。这些就不说了。egl 环境需要一个surface
         2 然后还有加载对应的硬解shader 创建一个纹理 通过这个纹理。我们创建一个
-        surfaceTexture ，然后 再创建一个surface 。然后传给 mediacodec
+        mediaCodeSurfaceTexture ，然后 通过mediaCodeSurfaceTexture 再创建一个surface 。然后把 新创建的 surface 传给 mediacodec
         初始化mediacodec  start（）
         3 然后ffmpeg 解码得到avpacket 传递 给mediacodec 进行硬解码
         4 我们硬解码的数据是更新到这个surfac上的。
-        5 那么如何渲染到我们第一个surface 上。我猜测是通过创建的纹理。这个纹理
-        上有硬解得到的yuv 数据。再渲染到我们的 第一个surface上
+        5 那么如何渲染到我们用于Act 中的TextureView 的 surface 上。我猜测是我们上面新创建的surface。
+        这个surface 上有 硬解得到的yuv 数据。再 draw的时候我们调用了
+        mediaCodeSurfaceTexture.updateTexImage();这个方法可能会将当前这一帧的数据 拿出来 通过纹理id
+        然后egl 内部会swapbuffers通过这个纹理id交换数据，再渲染到我们的 我们act 中的surface  上
 
         事实证明是对的。（一开始 传给 mediacodec 的是 第一个surface 。这个surface 没有
         纹理id所以在的一直报错。网上找了好久的答案？）

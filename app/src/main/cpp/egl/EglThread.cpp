@@ -118,7 +118,7 @@ void EglThread::setRenderType(int renderType) {
  */
 void EglThread::notifyRender() {
     /**  方法需要锁的指针 对象
-     *   & 表示引用 。引用这个变量的 就是他的指针
+     *   & 表示引用 。引用这个变量的  得到的就是他的指针
      */
     pthread_mutex_lock(&pthreadMutex);
 
