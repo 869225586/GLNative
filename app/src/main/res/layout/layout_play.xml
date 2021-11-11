@@ -6,7 +6,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     >
-
+    <View
+        android:id="@+id/toobar"
+        android:background="#000"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"/>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

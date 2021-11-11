@@ -41,11 +41,16 @@
         4 我们硬解码的数据是更新到这个surfac上的。
         5 那么如何渲染到我们用于Act 中的TextureView 的 surface 上。我猜测是我们上面新创建的surface。
         这个surface 上有 硬解得到的yuv 数据。再 draw的时候我们调用了
-        mediaCodeSurfaceTexture.updateTexImage();这个方法可能会将当前这一帧的数据 拿出来 通过纹理id
+        mediaCodeSurfaceTexture.updateTexImage();(
+        图形生产者对象生产一帧数据后，会回调onFrameAvailable通知应用程序有新的图像数据可以使用，
+        应用程序就可以调用updateTexImage将图像数据先送到Texture 也就是纹理id上
+        )
         然后egl 内部会swapbuffers通过这个纹理id交换数据，再渲染到我们的 我们act 中的surface  上
+        正常软解是 有yuv 数据渲染到surface上 但是硬解没有。使用过 这个生成的纹理id 然后 updateTexImage 拿到图像数据 交给opengl
+        渲染给 surface。
 
-        事实证明是对的。（一开始 传给 mediacodec 的是 第一个surface 。这个surface 没有
-        纹理id所以在的一直报错。网上找了好久的答案？）
+        事实证明是对的。（一开始 传给 mediacodec 的是 act 的 surface 。这个surface 没有
+        纹理id所以在的一直报错。网上找了好久的答案）
     4 glViewport 的作用 ?
      glViewport(0(x), 0(y), width(surfaceW), height(surfaceH));
      X，Y—以像素为单位，指定了视口的左下角（在第一象限内，以（0，0）为原点的）位置。

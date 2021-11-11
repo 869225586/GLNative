@@ -3,6 +3,7 @@ package com.sunyeyu.video.uikit.anative
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.graphics.Color
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -26,6 +27,7 @@ import com.sunyeyu.video.uikit.util.MyClickListener
 import com.sunyeyu.video.uikit.util.MyClickListener.MyClickCallBack
 import com.sunyeyu.video.uikit.widget.CustomSeekBar
 import com.syy.video.danmu.widget.BrrageTextureView
+import kotlinx.android.synthetic.main.layout_play.*
 import java.io.File
 import java.io.FileInputStream
 
@@ -92,6 +94,7 @@ class PlayerActivity : AppCompatActivity() {
     lateinit var  brrageView :BrrageTextureView
     lateinit var seekbar: CustomSeekBar;
     lateinit var iv_pause: ImageView
+    lateinit var toolbar:View
     var isexit = false
     private var startX = 0;
     private var startY = 0;
@@ -115,7 +118,18 @@ class PlayerActivity : AppCompatActivity() {
 
     }
     private val menuRunnable = Runnable { rl_player.visibility = View.GONE }
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (Build.VERSION_CODES.KITKAT <= Build.VERSION.SDK_INT) {
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+            window.statusBarColor = Color.TRANSPARENT
+            window.navigationBarColor = Color.TRANSPARENT
+        } else {
+            window.statusBarColor = Color.TRANSPARENT
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_play)
         initView()
@@ -193,6 +207,7 @@ class PlayerActivity : AppCompatActivity() {
         rl_player = findViewById(R.id.rl_player)
         brrageView = findViewById(R.id.dmView)
         myTextureView = MyTextureView(this);
+        toolbar = findViewById(R.id.toobar)
         var lp = RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.MATCH_PARENT,
             RelativeLayout.LayoutParams.MATCH_PARENT
@@ -206,8 +221,10 @@ class PlayerActivity : AppCompatActivity() {
                 } else {
                     if (rl_player.visibility == View.VISIBLE) {
                         rl_player.visibility = View.GONE
+                        setStatusBarVisible2(false);
                     } else {
                         rl_player.visibility = View.VISIBLE
+                        setStatusBarVisible2(true)
                     }
                 }
             }
@@ -242,7 +259,7 @@ class PlayerActivity : AppCompatActivity() {
             }
         })
     }
-
+    
     override fun onDestroy() {
         super.onDestroy()
 
@@ -262,12 +279,31 @@ class PlayerActivity : AppCompatActivity() {
         super.onConfigurationChanged(newConfig)
         if (newConfig.orientation === ActivityInfo.SCREEN_ORIENTATION_USER) {
             startMenuTask()
+            toolbar.visibility = View.GONE
+//            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         } else {
+            toolbar.visibility = View.VISIBLE
             removeMenuTask()
         }
 
     }
 
+    /**
+     * 动态显示和隐藏状态栏
+     */
+    private fun setStatusBarVisible2(show: Boolean) {
+        if (show) {
+            var uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            uiFlags = uiFlags or 0x00001000
+            window.decorView.systemUiVisibility = uiFlags
+        } else {
+            var uiFlags = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN)
+            uiFlags = uiFlags or 0x00001000
+            window.decorView.systemUiVisibility = uiFlags
+        }
+    }
     /**
      * 开启全屏播放
      */
