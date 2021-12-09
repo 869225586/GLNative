@@ -87,7 +87,7 @@ public class PlayerRelativeLayout extends RelativeLayout {
                         if (touchGestor != null) {
                             touchGestor.onUpDownMoveTouchUp();
                         }
-                        isLeftRightmove = false;
+                        isUpDownMove = false;
                     }
                 }
                 break;
