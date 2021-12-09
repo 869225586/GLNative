@@ -2,6 +2,7 @@ package com.sunyeyu.video.uikit.widget;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.media.AudioManager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,7 +24,6 @@ public class CustomSeekBar extends RelativeLayout {
         super(context);
         init();
     }
-
     public CustomSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();

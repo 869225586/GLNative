@@ -44,7 +44,6 @@ public class CameraUtils {
     public void stopPreview() {
         if (camera != null) {
             camera.stopPreview();
-            camera.release();
             camera = null;
         }
     }

@@ -196,7 +196,7 @@ Opengl::Opengl(CallJava *callJava) {
     LOGD("initOpenGl");
     baseRender = new FilFilterVboYuv();
 //    baseRender = new CameraRender(callJava);
-    mediaCodecRen = new MediaCodecRender(callJava);
+    mediaCodecRen = new MediaCodecRender(callJava);z
 }
 
 void Opengl::pause() {

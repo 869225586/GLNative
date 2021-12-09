@@ -34,7 +34,7 @@
     2 yuv 420 p 是视频裸数据  不是我们普通意义上的mp4 等等 视频格式 h264 h265 是一种压缩算法 mp4 是一种视频的封装格式
     3 MediaCodec 硬解 流程
         1 初始化egl 环境。这些就不说了。egl 环境需要一个surface
-        2 然后还有加载对应的硬解shader 创建一个纹理 通过这个纹理。我们创建一个
+        2 然后还有加载对应的硬解shader 创建一个纹理id 通过这个纹理id。我们创建一个
         mediaCodeSurfaceTexture ，然后 通过mediaCodeSurfaceTexture 再创建一个surface 。然后把 新创建的 surface 传给 mediacodec
         初始化mediacodec  start（）
         3 然后ffmpeg 解码得到avpacket 传递 给mediacodec 进行硬解码
